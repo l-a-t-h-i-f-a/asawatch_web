@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data Responden · AsaWatch Admin</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/asawatch.css">
+</head>
+<body>
+
+<div class="offcanvas offcanvas-start hw-offcanvas" tabindex="-1" id="hwNav" aria-label="Menu utama">
+  <div class="offcanvas-header pb-0 justify-content-end p-0">
+    <button class="btn-close" type="button" data-bs-dismiss="offcanvas" aria-label="Tutup"></button>
+  </div>
+  <div class="offcanvas-body p-0 d-flex">
+<aside class="hw-sidebar">
+  <div class="hw-brand">
+    <div class="hw-brand-mark"><i class="bi bi-heart-pulse-fill"></i></div>
+    <div>
+      <div class="hw-brand-name">Asa<span>Watch</span></div>
+      <div class="hw-brand-sub">Panel Peneliti</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="hw-navlabel">MENU UTAMA</div>
+    <nav class="hw-nav nav flex-column">
+      <a class="nav-link" href="dashboard.html">
+        <i class="bi bi-grid-1x2"></i><span class="flex-grow-1">Dashboard</span>
+      </a>
+      <a class="nav-link active" href="responden.html">
+        <i class="bi bi-people"></i><span class="flex-grow-1">Data Responden</span><span class="badge rounded-pill">84</span>
+      </a>
+      <a class="nav-link" href="detail.html">
+        <i class="bi bi-person-vcard"></i><span class="flex-grow-1">Detail Responden</span>
+      </a>
+      <a class="nav-link" href="analitik.html">
+        <i class="bi bi-graph-up-arrow"></i><span class="flex-grow-1">Analitik Penelitian</span>
+      </a>
+      <a class="nav-link" href="ekspor.html">
+        <i class="bi bi-cloud-arrow-down"></i><span class="flex-grow-1">Ekspor Dataset</span><span class="badge rounded-pill">3</span>
+      </a>
+    </nav>
+  </div>
+
+  <div class="mt-auto p-3" style="background:#EFFAF4;border:1px solid #D6EFE2;border-radius:1rem">
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <i class="bi bi-shield-check" style="color:var(--hw-green-400)"></i>
+      <div class="fw-bold" style="font-size:.82rem">Data Terlindungi</div>
+    </div>
+    <div style="font-size:.75rem;line-height:1.5;color:#5D7A6D">Akses data lansia mengikuti persetujuan etik No. 042/KEPK/2026.</div>
+  </div>
+
+  <div class="d-flex align-items-center gap-2 p-2 rounded-3" style="background:var(--hw-soft)">
+    <div class="hw-avatar">DR</div>
+    <div class="flex-grow-1 min-w-0">
+      <div class="fw-bold text-truncate" style="font-size:.84rem">Dr. Ratna Wijaya</div>
+      <div style="font-size:.72rem;color:var(--hw-muted)">Peneliti Utama</div>
+    </div>
+    <a href="login.html" title="Keluar" style="color:var(--hw-muted-2)"><i class="bi bi-box-arrow-right"></i></a>
+  </div>
+</aside>
+  </div>
+</div>
+<div class="hw-shell">
+
+<aside class="hw-sidebar">
+  <div class="hw-brand">
+    <div class="hw-brand-mark"><i class="bi bi-heart-pulse-fill"></i></div>
+    <div>
+      <div class="hw-brand-name">Asa<span>Watch</span></div>
+      <div class="hw-brand-sub">Panel Peneliti</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="hw-navlabel">MENU UTAMA</div>
+    <nav class="hw-nav nav flex-column">
+      <a class="nav-link" href="dashboard.html">
+        <i class="bi bi-grid-1x2"></i><span class="flex-grow-1">Dashboard</span>
+      </a>
+      <a class="nav-link active" href="responden.html">
+        <i class="bi bi-people"></i><span class="flex-grow-1">Data Responden</span><span class="badge rounded-pill">84</span>
+      </a>
+      <a class="nav-link" href="detail.html">
+        <i class="bi bi-person-vcard"></i><span class="flex-grow-1">Detail Responden</span>
+      </a>
+      <a class="nav-link" href="analitik.html">
+        <i class="bi bi-graph-up-arrow"></i><span class="flex-grow-1">Analitik Penelitian</span>
+      </a>
+      <a class="nav-link" href="ekspor.html">
+        <i class="bi bi-cloud-arrow-down"></i><span class="flex-grow-1">Ekspor Dataset</span><span class="badge rounded-pill">3</span>
+      </a>
+    </nav>
+  </div>
+
+  <div class="mt-auto p-3" style="background:#EFFAF4;border:1px solid #D6EFE2;border-radius:1rem">
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <i class="bi bi-shield-check" style="color:var(--hw-green-400)"></i>
+      <div class="fw-bold" style="font-size:.82rem">Data Terlindungi</div>
+    </div>
+    <div style="font-size:.75rem;line-height:1.5;color:#5D7A6D">Akses data lansia mengikuti persetujuan etik No. 042/KEPK/2026.</div>
+  </div>
+
+  <div class="d-flex align-items-center gap-2 p-2 rounded-3" style="background:var(--hw-soft)">
+    <div class="hw-avatar">DR</div>
+    <div class="flex-grow-1 min-w-0">
+      <div class="fw-bold text-truncate" style="font-size:.84rem">Dr. Ratna Wijaya</div>
+      <div style="font-size:.72rem;color:var(--hw-muted)">Peneliti Utama</div>
+    </div>
+    <a href="login.html" title="Keluar" style="color:var(--hw-muted-2)"><i class="bi bi-box-arrow-right"></i></a>
+  </div>
+</aside>
+  <main class="hw-main">
+
+  <header class="hw-header d-flex align-items-center gap-3 flex-wrap">
+    <button class="hw-burger d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#hwNav" aria-controls="hwNav" aria-label="Buka menu">
+      <i class="bi bi-list"></i>
+    </button>
+    <div class="flex-grow-1" style="min-width:220px">
+      <div style="font-size:1.32rem;font-weight:800;letter-spacing:-.4px">Data Responden</div>
+      <div class="hw-sub">Daftar lansia peserta penelitian beserta pengukuran terakhir</div>
+    </div>
+    <div class="position-relative" style="flex:0 1 280px;min-width:150px">
+      <i class="bi bi-search position-absolute" style="left:14px;top:11px;color:var(--hw-muted-2);font-size:.85rem"></i>
+      <input class="form-control ps-5" placeholder="Cari nama atau ID responden">
+    </div>
+    <button class="btn btn-hw-outline d-flex align-items-center gap-2">
+      <i class="bi bi-calendar3" style="color:var(--hw-green-400)"></i> 1 – 27 Juli 2026
+    </button>
+    <button class="btn btn-hw-outline position-relative" style="width:42px;height:42px;padding:0">
+      <i class="bi bi-bell"></i>
+      <span class="position-absolute rounded-circle" style="top:8px;right:9px;width:8px;height:8px;background:var(--hw-red);border:2px solid #fff"></span>
+    </button>
+  </header>
+    <div class="hw-content d-flex flex-column gap-4">
+
+      <div class="hw-card d-flex align-items-center gap-3 flex-wrap" style="padding:1.1rem 1.35rem">
+        <div class="hw-seg">
+          <button class="active">Semua</button><button>Normal</button><button>Pantau</button><button>Perlu Perhatian</button>
+        </div>
+        <div class="flex-grow-1"></div>
+        <select class="form-select w-auto fw-semibold"><option>Semua Wisma</option><option>Wisma Melati</option><option>Wisma Anggrek</option><option>Wisma Cempaka</option></select>
+        <select class="form-select w-auto fw-semibold"><option>Semua Usia</option><option>60 – 69 tahun</option><option>70 – 79 tahun</option><option>80+ tahun</option></select>
+        <a class="btn btn-hw d-flex align-items-center gap-2" href="ekspor.html"><i class="bi bi-download"></i> Ekspor 84 data</a>
+      </div>
+
+      <div class="hw-card" style="padding:.5rem 1.35rem 1.1rem">
+        <div class="table-responsive">
+          <table class="table hw-table">
+            <thead><tr>
+              <th style="width:34px"><input class="form-check-input" type="checkbox"></th>
+              <th>Responden</th><th>Usia</th><th>Detak</th><th>Gula Darah</th><th>Tensi</th><th>Skor</th><th>Status</th><th></th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td><input class="form-check-input" type="checkbox"></td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-avatar">BH</div>
+                    <div><div class="fw-bold" style="font-size:.88rem">Bambang Hartono</div><div style="font-size:.75rem;color:var(--hw-muted)">RSP-004 · Wisma Anggrek</div></div>
+                  </div>
+                </td>
+                <td style="font-size:.84rem;color:var(--hw-ink-2)">71 th</td>
+                <td class="fw-bold" style="font-size:.84rem">74 <span class="fw-normal" style="color:var(--hw-muted-2);font-size:.75rem">bpm</span></td>
+                <td class="fw-bold" style="font-size:.84rem">104 <span class="fw-normal" style="color:var(--hw-muted-2);font-size:.75rem">mg/dL</span></td>
+                <td class="fw-bold" style="font-size:.84rem">118/76</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-progress" style="width:56px"><span style="width:86%;background:var(--hw-green-400)"></span></div>
+                    <span class="fw-bold" style="font-size:.8rem">86</span>
+                  </div>
+                </td>
+                <td><span class="hw-pill hw-pill-ok">Normal</span></td>
+                <td class="text-end"><a class="btn btn-hw-outline" href="detail.html">Lihat</a></td>
+              </tr>
+              <tr>
+                <td><input class="form-check-input" type="checkbox"></td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-avatar">SA</div>
+                    <div><div class="fw-bold" style="font-size:.88rem">Siti Aminah</div><div style="font-size:.75rem;color:var(--hw-muted)">RSP-007 · Wisma Melati</div></div>
+                  </div>
+                </td>
+                <td style="font-size:.84rem;color:var(--hw-ink-2)">68 th</td>
+                <td class="fw-bold" style="font-size:.84rem">79 <span class="fw-normal" style="color:var(--hw-muted-2);font-size:.75rem">bpm</span></td>
+                <td class="fw-bold" style="font-size:.84rem">118 <span class="fw-normal" style="color:var(--hw-muted-2);font-size:.75rem">mg/dL</span></td>
+                <td class="fw-bold" style="font-size:.84rem">122/80</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-progress" style="width:56px"><span style="width:78%;background:var(--hw-orange)"></span></div>
+                    <span class="fw-bold" style="font-size:.8rem">78</span>
+                  </div>
+                </td>
+                <td><span class="hw-pill hw-pill-warn">Pantau</span></td>
+                <td class="text-end"><a class="btn btn-hw-outline" href="detail.html">Lihat</a></td>
+              </tr>
+              <tr>
+                <td><input class="form-check-input" type="checkbox"></td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-avatar">SY</div>
+                    <div><div class="fw-bold" style="font-size:.88rem">Suparman Yudi</div><div style="font-size:.75rem;color:var(--hw-muted)">RSP-011 · Wisma Cempaka</div></div>
+                  </div>
+                </td>
+                <td style="font-size:.84rem;color:var(--hw-ink-2)">83 th</td>
+                <td class="fw-bold" style="font-size:.84rem">88 <span class="fw-normal" style="color:var(--hw-muted-2);font-size:.75rem">bpm</span></td>
+                <td class="fw-bold" style="font-size:.84rem">141 <span class="fw-normal" style="color:var(--hw-muted-2);font-size:.75rem">mg/dL</span></td>
+                <td class="fw-bold" style="font-size:.84rem">146/92</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-progress" style="width:56px"><span style="width:54%;background:var(--hw-red)"></span></div>
+                    <span class="fw-bold" style="font-size:.8rem">54</span>
+                  </div>
+                </td>
+                <td><span class="hw-pill hw-pill-bad">Perlu Perhatian</span></td>
+                <td class="text-end"><a class="btn btn-hw-outline" href="detail.html">Lihat</a></td>
+              </tr>
+              <tr>
+                <td><input class="form-check-input" type="checkbox"></td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-avatar">NG</div>
+                    <div><div class="fw-bold" style="font-size:.88rem">Ngatinah</div><div style="font-size:.75rem;color:var(--hw-muted)">RSP-014 · Wisma Melati</div></div>
+                  </div>
+                </td>
+                <td style="font-size:.84rem;color:var(--hw-ink-2)">77 th</td>
+                <td class="fw-bold" style="font-size:.84rem">71 <span class="fw-normal" style="color:var(--hw-muted-2);font-size:.75rem">bpm</span></td>
+                <td class="fw-bold" style="font-size:.84rem">96 <span class="fw-normal" style="color:var(--hw-muted-2);font-size:.75rem">mg/dL</span></td>
+                <td class="fw-bold" style="font-size:.84rem">114/72</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-progress" style="width:56px"><span style="width:91%;background:var(--hw-green-400)"></span></div>
+                    <span class="fw-bold" style="font-size:.8rem">91</span>
+                  </div>
+                </td>
+                <td><span class="hw-pill hw-pill-ok">Normal</span></td>
+                <td class="text-end"><a class="btn btn-hw-outline" href="detail.html">Lihat</a></td>
+              </tr>
+              <tr>
+                <td><input class="form-check-input" type="checkbox"></td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-avatar">SM</div>
+                    <div><div class="fw-bold" style="font-size:.88rem">Sumiyati Marlina</div><div style="font-size:.75rem;color:var(--hw-muted)">RSP-018 · Wisma Melati</div></div>
+                  </div>
+                </td>
+                <td style="font-size:.84rem;color:var(--hw-ink-2)">74 th</td>
+                <td class="fw-bold" style="font-size:.84rem">92 <span class="fw-normal" style="color:var(--hw-muted-2);font-size:.75rem">bpm</span></td>
+                <td class="fw-bold" style="font-size:.84rem">138 <span class="fw-normal" style="color:var(--hw-muted-2);font-size:.75rem">mg/dL</span></td>
+                <td class="fw-bold" style="font-size:.84rem">152/94</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-progress" style="width:56px"><span style="width:49%;background:var(--hw-red)"></span></div>
+                    <span class="fw-bold" style="font-size:.8rem">49</span>
+                  </div>
+                </td>
+                <td><span class="hw-pill hw-pill-bad">Perlu Perhatian</span></td>
+                <td class="text-end"><a class="btn btn-hw-outline" href="detail.html">Lihat</a></td>
+              </tr>
+              <tr>
+                <td><input class="form-check-input" type="checkbox"></td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-avatar">HS</div>
+                    <div><div class="fw-bold" style="font-size:.88rem">Hadi Sucipto</div><div style="font-size:.75rem;color:var(--hw-muted)">RSP-021 · Wisma Anggrek</div></div>
+                  </div>
+                </td>
+                <td style="font-size:.84rem;color:var(--hw-ink-2)">66 th</td>
+                <td class="fw-bold" style="font-size:.84rem">76 <span class="fw-normal" style="color:var(--hw-muted-2);font-size:.75rem">bpm</span></td>
+                <td class="fw-bold" style="font-size:.84rem">109 <span class="fw-normal" style="color:var(--hw-muted-2);font-size:.75rem">mg/dL</span></td>
+                <td class="fw-bold" style="font-size:.84rem">120/78</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-progress" style="width:56px"><span style="width:84%;background:var(--hw-green-400)"></span></div>
+                    <span class="fw-bold" style="font-size:.8rem">84</span>
+                  </div>
+                </td>
+                <td><span class="hw-pill hw-pill-ok">Normal</span></td>
+                <td class="text-end"><a class="btn btn-hw-outline" href="detail.html">Lihat</a></td>
+              </tr>
+              <tr>
+                <td><input class="form-check-input" type="checkbox"></td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-avatar">RM</div>
+                    <div><div class="fw-bold" style="font-size:.88rem">Rusminah</div><div style="font-size:.75rem;color:var(--hw-muted)">RSP-026 · Wisma Cempaka</div></div>
+                  </div>
+                </td>
+                <td style="font-size:.84rem;color:var(--hw-ink-2)">80 th</td>
+                <td class="fw-bold" style="font-size:.84rem">84 <span class="fw-normal" style="color:var(--hw-muted-2);font-size:.75rem">bpm</span></td>
+                <td class="fw-bold" style="font-size:.84rem">127 <span class="fw-normal" style="color:var(--hw-muted-2);font-size:.75rem">mg/dL</span></td>
+                <td class="fw-bold" style="font-size:.84rem">138/86</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-progress" style="width:56px"><span style="width:63%;background:var(--hw-orange)"></span></div>
+                    <span class="fw-bold" style="font-size:.8rem">63</span>
+                  </div>
+                </td>
+                <td><span class="hw-pill hw-pill-warn">Pantau</span></td>
+                <td class="text-end"><a class="btn btn-hw-outline" href="detail.html">Lihat</a></td>
+              </tr>
+              <tr>
+                <td><input class="form-check-input" type="checkbox"></td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-avatar">SR</div>
+                    <div><div class="fw-bold" style="font-size:.88rem">Slamet Riyadi</div><div style="font-size:.75rem;color:var(--hw-muted)">RSP-030 · Wisma Anggrek</div></div>
+                  </div>
+                </td>
+                <td style="font-size:.84rem;color:var(--hw-ink-2)">72 th</td>
+                <td class="fw-bold" style="font-size:.84rem">73 <span class="fw-normal" style="color:var(--hw-muted-2);font-size:.75rem">bpm</span></td>
+                <td class="fw-bold" style="font-size:.84rem">101 <span class="fw-normal" style="color:var(--hw-muted-2);font-size:.75rem">mg/dL</span></td>
+                <td class="fw-bold" style="font-size:.84rem">116/74</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-progress" style="width:56px"><span style="width:89%;background:var(--hw-green-400)"></span></div>
+                    <span class="fw-bold" style="font-size:.8rem">89</span>
+                  </div>
+                </td>
+                <td><span class="hw-pill hw-pill-ok">Normal</span></td>
+                <td class="text-end"><a class="btn btn-hw-outline" href="detail.html">Lihat</a></td>
+              </tr>
+              <tr>
+                <td><input class="form-check-input" type="checkbox"></td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-avatar">KD</div>
+                    <div><div class="fw-bold" style="font-size:.88rem">Kartini Dewi</div><div style="font-size:.75rem;color:var(--hw-muted)">RSP-033 · Wisma Melati</div></div>
+                  </div>
+                </td>
+                <td style="font-size:.84rem;color:var(--hw-ink-2)">69 th</td>
+                <td class="fw-bold" style="font-size:.84rem">81 <span class="fw-normal" style="color:var(--hw-muted-2);font-size:.75rem">bpm</span></td>
+                <td class="fw-bold" style="font-size:.84rem">122 <span class="fw-normal" style="color:var(--hw-muted-2);font-size:.75rem">mg/dL</span></td>
+                <td class="fw-bold" style="font-size:.84rem">128/82</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-progress" style="width:56px"><span style="width:74%;background:var(--hw-orange)"></span></div>
+                    <span class="fw-bold" style="font-size:.8rem">74</span>
+                  </div>
+                </td>
+                <td><span class="hw-pill hw-pill-warn">Pantau</span></td>
+                <td class="text-end"><a class="btn btn-hw-outline" href="detail.html">Lihat</a></td>
+              </tr>
+              <tr>
+                <td><input class="form-check-input" type="checkbox"></td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-avatar">SW</div>
+                    <div><div class="fw-bold" style="font-size:.88rem">Sukarno Widodo</div><div style="font-size:.75rem;color:var(--hw-muted)">RSP-037 · Wisma Cempaka</div></div>
+                  </div>
+                </td>
+                <td style="font-size:.84rem;color:var(--hw-ink-2)">85 th</td>
+                <td class="fw-bold" style="font-size:.84rem">90 <span class="fw-normal" style="color:var(--hw-muted-2);font-size:.75rem">bpm</span></td>
+                <td class="fw-bold" style="font-size:.84rem">134 <span class="fw-normal" style="color:var(--hw-muted-2);font-size:.75rem">mg/dL</span></td>
+                <td class="fw-bold" style="font-size:.84rem">144/90</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-progress" style="width:56px"><span style="width:57%;background:var(--hw-red)"></span></div>
+                    <span class="fw-bold" style="font-size:.8rem">57</span>
+                  </div>
+                </td>
+                <td><span class="hw-pill hw-pill-bad">Perlu Perhatian</span></td>
+                <td class="text-end"><a class="btn btn-hw-outline" href="detail.html">Lihat</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-3 px-1">
+          <div style="font-size:.8rem;color:var(--hw-muted)">Menampilkan 10 dari 84 responden</div>
+          <nav><ul class="pagination pagination-sm mb-0 gap-1">
+            <li class="page-item"><a class="page-link border rounded-3" href="#">‹</a></li>
+            <li class="page-item active"><a class="page-link border rounded-3" href="#">1</a></li>
+            <li class="page-item"><a class="page-link border rounded-3" href="#">2</a></li>
+            <li class="page-item"><a class="page-link border rounded-3" href="#">3</a></li>
+            <li class="page-item disabled"><span class="page-link border rounded-3">…</span></li>
+            <li class="page-item"><a class="page-link border rounded-3" href="#">9</a></li>
+            <li class="page-item"><a class="page-link border rounded-3" href="#">›</a></li>
+          </ul></nav>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/asawatch.js"></script>
+</body>
+</html>

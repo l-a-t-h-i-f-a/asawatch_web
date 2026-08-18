@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard Penelitian · AsaWatch Admin</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/asawatch.css">
+</head>
+<body>
+
+<div class="offcanvas offcanvas-start hw-offcanvas" tabindex="-1" id="hwNav" aria-label="Menu utama">
+  <div class="offcanvas-header pb-0 justify-content-end p-0">
+    <button class="btn-close" type="button" data-bs-dismiss="offcanvas" aria-label="Tutup"></button>
+  </div>
+  <div class="offcanvas-body p-0 d-flex">
+<aside class="hw-sidebar">
+  <div class="hw-brand">
+    <div class="hw-brand-mark"><i class="bi bi-heart-pulse-fill"></i></div>
+    <div>
+      <div class="hw-brand-name">Asa<span>Watch</span></div>
+      <div class="hw-brand-sub">Panel Peneliti</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="hw-navlabel">MENU UTAMA</div>
+    <nav class="hw-nav nav flex-column">
+      <a class="nav-link active" href="dashboard.html">
+        <i class="bi bi-grid-1x2"></i><span class="flex-grow-1">Dashboard</span>
+      </a>
+      <a class="nav-link" href="responden.html">
+        <i class="bi bi-people"></i><span class="flex-grow-1">Data Responden</span><span class="badge rounded-pill">84</span>
+      </a>
+      <a class="nav-link" href="detail.html">
+        <i class="bi bi-person-vcard"></i><span class="flex-grow-1">Detail Responden</span>
+      </a>
+      <a class="nav-link" href="analitik.html">
+        <i class="bi bi-graph-up-arrow"></i><span class="flex-grow-1">Analitik Penelitian</span>
+      </a>
+      <a class="nav-link" href="ekspor.html">
+        <i class="bi bi-cloud-arrow-down"></i><span class="flex-grow-1">Ekspor Dataset</span><span class="badge rounded-pill">3</span>
+      </a>
+    </nav>
+  </div>
+
+  <div class="mt-auto p-3" style="background:#EFFAF4;border:1px solid #D6EFE2;border-radius:1rem">
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <i class="bi bi-shield-check" style="color:var(--hw-green-400)"></i>
+      <div class="fw-bold" style="font-size:.82rem">Data Terlindungi</div>
+    </div>
+    <div style="font-size:.75rem;line-height:1.5;color:#5D7A6D">Akses data lansia mengikuti persetujuan etik No. 042/KEPK/2026.</div>
+  </div>
+
+  <div class="d-flex align-items-center gap-2 p-2 rounded-3" style="background:var(--hw-soft)">
+    <div class="hw-avatar">DR</div>
+    <div class="flex-grow-1 min-w-0">
+      <div class="fw-bold text-truncate" style="font-size:.84rem">Dr. Ratna Wijaya</div>
+      <div style="font-size:.72rem;color:var(--hw-muted)">Peneliti Utama</div>
+    </div>
+    <a href="login.html" title="Keluar" style="color:var(--hw-muted-2)"><i class="bi bi-box-arrow-right"></i></a>
+  </div>
+</aside>
+  </div>
+</div>
+<div class="hw-shell">
+
+<aside class="hw-sidebar">
+  <div class="hw-brand">
+    <div class="hw-brand-mark"><i class="bi bi-heart-pulse-fill"></i></div>
+    <div>
+      <div class="hw-brand-name">Asa<span>Watch</span></div>
+      <div class="hw-brand-sub">Panel Peneliti</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="hw-navlabel">MENU UTAMA</div>
+    <nav class="hw-nav nav flex-column">
+      <a class="nav-link active" href="dashboard.html">
+        <i class="bi bi-grid-1x2"></i><span class="flex-grow-1">Dashboard</span>
+      </a>
+      <a class="nav-link" href="responden.html">
+        <i class="bi bi-people"></i><span class="flex-grow-1">Data Responden</span><span class="badge rounded-pill">84</span>
+      </a>
+      <a class="nav-link" href="detail.html">
+        <i class="bi bi-person-vcard"></i><span class="flex-grow-1">Detail Responden</span>
+      </a>
+      <a class="nav-link" href="analitik.html">
+        <i class="bi bi-graph-up-arrow"></i><span class="flex-grow-1">Analitik Penelitian</span>
+      </a>
+      <a class="nav-link" href="ekspor.html">
+        <i class="bi bi-cloud-arrow-down"></i><span class="flex-grow-1">Ekspor Dataset</span><span class="badge rounded-pill">3</span>
+      </a>
+    </nav>
+  </div>
+
+  <div class="mt-auto p-3" style="background:#EFFAF4;border:1px solid #D6EFE2;border-radius:1rem">
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <i class="bi bi-shield-check" style="color:var(--hw-green-400)"></i>
+      <div class="fw-bold" style="font-size:.82rem">Data Terlindungi</div>
+    </div>
+    <div style="font-size:.75rem;line-height:1.5;color:#5D7A6D">Akses data lansia mengikuti persetujuan etik No. 042/KEPK/2026.</div>
+  </div>
+
+  <div class="d-flex align-items-center gap-2 p-2 rounded-3" style="background:var(--hw-soft)">
+    <div class="hw-avatar">DR</div>
+    <div class="flex-grow-1 min-w-0">
+      <div class="fw-bold text-truncate" style="font-size:.84rem">Dr. Ratna Wijaya</div>
+      <div style="font-size:.72rem;color:var(--hw-muted)">Peneliti Utama</div>
+    </div>
+    <a href="login.html" title="Keluar" style="color:var(--hw-muted-2)"><i class="bi bi-box-arrow-right"></i></a>
+  </div>
+</aside>
+  <main class="hw-main">
+
+  <header class="hw-header d-flex align-items-center gap-3 flex-wrap">
+    <button class="hw-burger d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#hwNav" aria-controls="hwNav" aria-label="Buka menu">
+      <i class="bi bi-list"></i>
+    </button>
+    <div class="flex-grow-1" style="min-width:220px">
+      <div style="font-size:1.32rem;font-weight:800;letter-spacing:-.4px">Dashboard Penelitian</div>
+      <div class="hw-sub">Ringkasan kesehatan 84 lansia di Panti Wreda Bhakti Luhur · diperbarui 08:00</div>
+    </div>
+    <div class="position-relative" style="flex:0 1 280px;min-width:150px">
+      <i class="bi bi-search position-absolute" style="left:14px;top:11px;color:var(--hw-muted-2);font-size:.85rem"></i>
+      <input class="form-control ps-5" placeholder="Cari nama atau ID responden">
+    </div>
+    <button class="btn btn-hw-outline d-flex align-items-center gap-2">
+      <i class="bi bi-calendar3" style="color:var(--hw-green-400)"></i> 1 – 27 Juli 2026
+    </button>
+    <button class="btn btn-hw-outline position-relative" style="width:42px;height:42px;padding:0">
+      <i class="bi bi-bell"></i>
+      <span class="position-absolute rounded-circle" style="top:8px;right:9px;width:8px;height:8px;background:var(--hw-red);border:2px solid #fff"></span>
+    </button>
+  </header>
+    <div class="hw-content d-flex flex-column gap-4">
+
+      <div class="row g-3">
+        <div class="col-12 col-sm-6 col-xxl-3">
+          <div class="hw-card hw-card-pad h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <div class="hw-icon-box" style="background:var(--hw-tint);color:var(--hw-green-600)"><i class="bi bi-people-fill"></i></div>
+              <span class="hw-pill hw-pill-ok">+6 bulan ini</span>
+            </div>
+            <div class="fw-semibold" style="font-size:.82rem;color:var(--hw-muted)">Responden Aktif</div>
+            <div class="d-flex align-items-baseline gap-1 mt-1">
+              <div class="hw-kpi-value">84</div>
+              <div class="fw-semibold" style="font-size:.82rem;color:var(--hw-muted)">lansia</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-sm-6 col-xxl-3">
+          <div class="hw-card hw-card-pad h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <div class="hw-icon-box" style="background:#FDECEC;color:#C1272D"><i class="bi bi-heart-pulse-fill"></i></div>
+              <span class="hw-pill hw-pill-ok">Normal</span>
+            </div>
+            <div class="fw-semibold" style="font-size:.82rem;color:var(--hw-muted)">Rata-rata Detak Jantung</div>
+            <div class="d-flex align-items-baseline gap-1 mt-1">
+              <div class="hw-kpi-value">78</div>
+              <div class="fw-semibold" style="font-size:.82rem;color:var(--hw-muted)">bpm</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-sm-6 col-xxl-3">
+          <div class="hw-card hw-card-pad h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <div class="hw-icon-box" style="background:#FFF4E0;color:#B26A00"><i class="bi bi-exclamation-triangle-fill"></i></div>
+              <span class="hw-pill hw-pill-warn">+2 vs kemarin</span>
+            </div>
+            <div class="fw-semibold" style="font-size:.82rem;color:var(--hw-muted)">Perlu Perhatian</div>
+            <div class="d-flex align-items-baseline gap-1 mt-1">
+              <div class="hw-kpi-value">7</div>
+              <div class="fw-semibold" style="font-size:.82rem;color:var(--hw-muted)">kasus</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-sm-6 col-xxl-3">
+          <div class="hw-card hw-card-pad h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <div class="hw-icon-box" style="background:#E9F4FB;color:#1B7FA8"><i class="bi bi-arrow-repeat"></i></div>
+              <span class="hw-pill hw-pill-info">94%</span>
+            </div>
+            <div class="fw-semibold" style="font-size:.82rem;color:var(--hw-muted)">Sinkronisasi Hari Ini</div>
+            <div class="d-flex align-items-baseline gap-1 mt-1">
+              <div class="hw-kpi-value">79</div>
+              <div class="fw-semibold" style="font-size:.82rem;color:var(--hw-muted)">/ 84 watch</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-12 col-xl-8">
+          <div class="hw-card hw-card-pad h-100">
+            <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
+              <div>
+                <div class="hw-title">Tren Agregat Kesehatan Lansia</div>
+                <div class="hw-sub">Rata-rata seluruh responden aktif</div>
+              </div>
+              <div class="hw-seg" data-target="#chartTren">
+            <button class="active" data-range="harian">Harian</button>
+            <button data-range="mingguan">Mingguan</button>
+            <button data-range="bulanan">Bulanan</button>
+          </div>
+            </div>
+            <div class="d-flex flex-wrap gap-4 my-3">
+              <div class="d-flex align-items-center gap-2 fw-semibold" style="font-size:.78rem;color:var(--hw-ink-2)"><span class="rounded-circle" style="width:9px;height:9px;background:var(--hw-green-400)"></span>Detak jantung (bpm)</div>
+              <div class="d-flex align-items-center gap-2 fw-semibold" style="font-size:.78rem;color:var(--hw-ink-2)"><span class="rounded-circle" style="width:9px;height:9px;background:var(--hw-blue)"></span>Gula darah (mg/dL)</div>
+              <div class="d-flex align-items-center gap-2 fw-semibold" style="font-size:.78rem;color:var(--hw-ink-2)"><span class="rounded-circle" style="width:9px;height:9px;background:var(--hw-orange)"></span>Sistolik (mmHg)</div>
+            </div>
+          <svg class="hw-chart" viewBox="0 0 640 210" data-chart="harian" data-axis-y="200" data-vb-height="210" data-plot-height="170" id="chartTren">
+            <g class="hw-grid"><line x1="0" y1="10" x2="640" y2="10"/><line x1="0" y1="60" x2="640" y2="60"/><line x1="0" y1="110" x2="640" y2="110"/><line x1="0" y1="160" x2="640" y2="160"/></g>
+            <polyline data-line="hr" fill="none" stroke="var(--hw-green-400)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline data-line="glu" fill="none" stroke="var(--hw-blue)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline data-line="bp" fill="none" stroke="var(--hw-orange)" stroke-width="2.6" stroke-dasharray="6 5" stroke-linecap="round"/>
+            <g class="hw-axis"></g>
+          </svg>
+          </div>
+        </div>
+        <div class="col-12 col-xl-4">
+          <div class="hw-card hw-card-pad h-100 d-flex flex-column gap-3">
+            <div>
+              <div class="hw-title">Distribusi Status</div>
+              <div class="hw-sub">Berdasarkan skor kesehatan terakhir</div>
+            </div>
+            <div>
+              <div class="d-flex justify-content-between fw-semibold mb-2" style="font-size:.84rem">
+                <span>Sehat (skor 80–100)</span><span style="color:var(--hw-muted)">41 lansia</span>
+              </div>
+              <div class="hw-progress" style="height:9px"><span style="width:49%;background:var(--hw-green-400)"></span></div>
+            </div>
+            <div>
+              <div class="d-flex justify-content-between fw-semibold mb-2" style="font-size:.84rem">
+                <span>Cukup (60–79)</span><span style="color:var(--hw-muted)">28 lansia</span>
+              </div>
+              <div class="hw-progress" style="height:9px"><span style="width:33%;background:#7ED0A8"></span></div>
+            </div>
+            <div>
+              <div class="d-flex justify-content-between fw-semibold mb-2" style="font-size:.84rem">
+                <span>Perlu pantau (40–59)</span><span style="color:var(--hw-muted)">12 lansia</span>
+              </div>
+              <div class="hw-progress" style="height:9px"><span style="width:14%;background:var(--hw-orange)"></span></div>
+            </div>
+            <div>
+              <div class="d-flex justify-content-between fw-semibold mb-2" style="font-size:.84rem">
+                <span>Risiko tinggi (&lt;40)</span><span style="color:var(--hw-muted)">3 lansia</span>
+              </div>
+              <div class="hw-progress" style="height:9px"><span style="width:4%;background:var(--hw-red)"></span></div>
+            </div>
+            <div class="hw-note mt-auto d-flex gap-2">
+              <i class="bi bi-lightbulb" style="color:var(--hw-green-400)"></i>
+              <div>7 lansia menunjukkan tekanan darah di atas ambang selama 3 hari berturut-turut. Disarankan tinjau catatan makanan mereka.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hw-card hw-card-pad">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+          <div>
+            <div class="hw-title">Perlu Perhatian Hari Ini</div>
+            <div class="hw-sub">Nilai di luar rentang normal pada sinkronisasi terakhir</div>
+          </div>
+          <a class="btn btn-hw-soft" href="responden.html">Lihat semua responden</a>
+        </div>
+        <div class="table-responsive">
+          <table class="table hw-table">
+            <thead><tr><th>Responden</th><th>Wisma</th><th>Temuan</th><th>Nilai</th><th>Sinkron</th><th></th></tr></thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-avatar">SM</div>
+                    <div><div class="fw-bold" style="font-size:.88rem">Sumiyati Marlina</div><div style="font-size:.75rem;color:var(--hw-muted)">RSP-018 · 74 th</div></div>
+                  </div>
+                </td>
+                <td style="font-size:.84rem;color:var(--hw-ink-2)">Melati 12</td>
+                <td style="font-size:.84rem;color:var(--hw-ink-2)">Tekanan darah tinggi 3 hari</td>
+                <td><span class="fw-bold text-bad" style="font-size:.84rem">152/94 mmHg</span></td>
+                <td style="font-size:.8rem;color:var(--hw-muted)">08:00</td>
+                <td class="text-end"><a class="btn btn-hw-outline" href="detail.html">Detail</a></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-avatar">SY</div>
+                    <div><div class="fw-bold" style="font-size:.88rem">Suparman Yudi</div><div style="font-size:.75rem;color:var(--hw-muted)">RSP-011 · 83 th</div></div>
+                  </div>
+                </td>
+                <td style="font-size:.84rem;color:var(--hw-ink-2)">Cempaka 04</td>
+                <td style="font-size:.84rem;color:var(--hw-ink-2)">Gula darah di atas ambang</td>
+                <td><span class="fw-bold text-bad" style="font-size:.84rem">141 mg/dL</span></td>
+                <td style="font-size:.8rem;color:var(--hw-muted)">08:00</td>
+                <td class="text-end"><a class="btn btn-hw-outline" href="detail.html">Detail</a></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-avatar">SW</div>
+                    <div><div class="fw-bold" style="font-size:.88rem">Sukarno Widodo</div><div style="font-size:.75rem;color:var(--hw-muted)">RSP-037 · 85 th</div></div>
+                  </div>
+                </td>
+                <td style="font-size:.84rem;color:var(--hw-ink-2)">Cempaka 09</td>
+                <td style="font-size:.84rem;color:var(--hw-ink-2)">Detak jantung istirahat naik</td>
+                <td><span class="fw-bold text-warn" style="font-size:.84rem">90 bpm</span></td>
+                <td style="font-size:.8rem;color:var(--hw-muted)">06:00</td>
+                <td class="text-end"><a class="btn btn-hw-outline" href="detail.html">Detail</a></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="hw-avatar">RM</div>
+                    <div><div class="fw-bold" style="font-size:.88rem">Rusminah</div><div style="font-size:.75rem;color:var(--hw-muted)">RSP-026 · 80 th</div></div>
+                  </div>
+                </td>
+                <td style="font-size:.84rem;color:var(--hw-ink-2)">Cempaka 02</td>
+                <td style="font-size:.84rem;color:var(--hw-ink-2)">Belum sinkron 2 hari</td>
+                <td><span class="fw-bold text-muted" style="font-size:.84rem">—</span></td>
+                <td style="font-size:.8rem;color:var(--hw-muted)">25 Jul</td>
+                <td class="text-end"><a class="btn btn-hw-outline" href="detail.html">Detail</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/asawatch.js"></script>
+</body>
+</html>
