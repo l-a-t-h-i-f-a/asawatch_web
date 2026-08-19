@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ExportController;
 use App\Http\Controllers\Admin\RespondentController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\VerifikasiEmailController;
 use Illuminate\Support\Facades\Route;
 
@@ -32,5 +33,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('ekspor', [ExportController::class, 'index'])->name('ekspor.index');
         Route::get('ekspor/json', [ExportController::class, 'downloadJson'])->name('ekspor.json');
         Route::get('ekspor/csv', [ExportController::class, 'downloadCsv'])->name('ekspor.csv');
+
+        Route::get('users', [UserController::class, 'index'])->name('users.index');
+        Route::get('users/{user}', [UserController::class, 'show'])->name('users.show');
+        Route::get('users/{user}/sesi/{sesi}', [UserController::class, 'showSession'])->name('users.session.show');
     });
 });

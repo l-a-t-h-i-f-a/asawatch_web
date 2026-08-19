@@ -12,6 +12,11 @@
     <a class="nav-link @if(($active ?? null) === 'dashboard') active @endif" href="{{ route('admin.dashboard') }}">
       <i class="bi bi-grid-1x2"></i><span class="flex-grow-1">Dashboard</span>
     </a>
+    @if(auth()->user()?->isAdmin())
+      <a class="nav-link @if(($active ?? null) === 'users') active @endif" href="{{ route('admin.users.index') }}">
+        <i class="bi bi-people-fill"></i><span class="flex-grow-1">Daftar Pengguna</span>
+      </a>
+    @endif
     <a class="nav-link @if(($active ?? null) === 'responden') active @endif" href="{{ route('admin.responden.index') }}">
       <i class="bi bi-clock-history"></i><span class="flex-grow-1">Riwayat Sesi</span>
       <span class="badge rounded-pill">{{ $totalSesi ?? 0 }}</span>
@@ -34,9 +39,15 @@
 <div class="mt-auto p-3" style="background:#EFFAF4;border:1px solid #D6EFE2;border-radius:1rem">
   <div class="d-flex align-items-center gap-2 mb-2">
     <i class="bi bi-shield-check" style="color:var(--hw-green-400)"></i>
-    <div class="fw-bold" style="font-size:.82rem">Data Terlindungi</div>
+    <div class="fw-bold" style="font-size:.82rem">@if(auth()->user()?->isAdmin()) Mode Administrator @else Data Terlindungi @endif</div>
   </div>
-  <div style="font-size:.75rem;line-height:1.5;color:#5D7A6D">Halaman ini hanya menampilkan data milikmu sendiri — tidak ada akses ke akun pengguna lain.</div>
+  <div style="font-size:.75rem;line-height:1.5;color:#5D7A6D">
+    @if(auth()->user()?->isAdmin())
+      Halaman ini menampilkan seluruh data responden dan pengguna sistem AsaWatch.
+    @else
+      Halaman ini hanya menampilkan data milikmu sendiri — tidak ada akses ke akun pengguna lain.
+    @endif
+  </div>
 </div>
 
 <div class="d-flex align-items-center gap-2 p-2 rounded-3" style="background:var(--hw-soft)">

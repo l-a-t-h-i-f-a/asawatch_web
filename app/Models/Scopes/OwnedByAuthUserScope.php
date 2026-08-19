@@ -20,6 +20,9 @@ class OwnedByAuthUserScope implements Scope
         }
 
         if ($user = auth()->user()) {
+            if ($user->isAdmin()) {
+                return;
+            }
             $builder->where($model->getTable().'.user_id', $user->id);
         }
     }

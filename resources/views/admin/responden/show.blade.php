@@ -19,7 +19,11 @@
 
 @section('content')
 
-  <a class="fw-bold text-decoration-none d-inline-flex align-items-center gap-2" href="{{ route('admin.responden.index') }}" style="font-size:.84rem"><i class="bi bi-arrow-left"></i> Kembali ke riwayat sesi</a>
+  @if(isset($isAdminView) && $isAdminView)
+    <a class="fw-bold text-decoration-none d-inline-flex align-items-center gap-2" href="{{ route('admin.users.show', $selectedUser) }}" style="font-size:.84rem"><i class="bi bi-arrow-left"></i> Kembali ke detail responden</a>
+  @else
+    <a class="fw-bold text-decoration-none d-inline-flex align-items-center gap-2" href="{{ route('admin.responden.index') }}" style="font-size:.84rem"><i class="bi bi-arrow-left"></i> Kembali ke riwayat sesi</a>
+  @endif
 
   <div class="hw-card hw-card-pad d-flex gap-3 align-items-center flex-wrap">
     <div class="hw-icon-box" style="width:64px;height:64px;border-radius:20px;font-size:1.4rem;background:var(--hw-tint);color:var(--hw-green-600)"><i class="bi bi-camera-fill"></i></div>

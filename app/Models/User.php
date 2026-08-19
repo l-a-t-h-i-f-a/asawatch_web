@@ -77,6 +77,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(TargetHarian::class);
     }
 
+    public function isAdmin(): bool
+    {
+        return $this->email === 'admin@asawatch.com';
+    }
+
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new AturUlangSandiNotification($token));

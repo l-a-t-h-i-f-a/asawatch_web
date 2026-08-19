@@ -14,7 +14,11 @@
 @endphp
 
 @section('content')
-  <a class="fw-bold text-decoration-none d-inline-flex align-items-center gap-2" href="{{ route('admin.responden.index') }}" style="font-size:.84rem"><i class="bi bi-arrow-left"></i> Kembali ke riwayat sesi</a>
+  @if(isset($isAdminView) && $isAdminView)
+    <a class="fw-bold text-decoration-none d-inline-flex align-items-center gap-2" href="{{ route('admin.users.index') }}" style="font-size:.84rem"><i class="bi bi-arrow-left"></i> Kembali ke daftar pengguna</a>
+  @else
+    <a class="fw-bold text-decoration-none d-inline-flex align-items-center gap-2" href="{{ route('admin.responden.index') }}" style="font-size:.84rem"><i class="bi bi-arrow-left"></i> Kembali ke riwayat sesi</a>
+  @endif
 
   <div class="row g-3">
     <div class="col-12 col-xl-8">
@@ -53,6 +57,31 @@
 
   <div class="row g-3">
     <div class="col-12 col-xl-7"><div class="hw-card hw-card-pad h-100"><div class="hw-title mb-3">Profil Kesehatan</div><div class="row g-3"><div class="col-6"><div class="hw-stat-label">Tinggi badan</div><div class="fw-bold mt-1">{{ $profil?->tinggi_cm ? $profil->tinggi_cm . ' cm' : 'Belum diisi' }}</div></div><div class="col-6"><div class="hw-stat-label">Berat badan</div><div class="fw-bold mt-1">{{ $profil?->berat_kg ? $profil->berat_kg . ' kg' : 'Belum diisi' }}</div></div><div class="col-6"><div class="hw-stat-label">SpO₂ terakhir</div><div class="fw-bold mt-1">{{ $sampel?->spo2 ? $sampel->spo2 . '%' : 'Belum ada data' }}</div></div><div class="col-6"><div class="hw-stat-label">Sampel terakhir</div><div class="fw-bold mt-1">{{ $sampel?->created_at?->translatedFormat('d M Y, H:i') ?? 'Belum ada data' }}</div></div></div></div></div>
-    <div class="col-12 col-xl-5"><div class="hw-card hw-card-pad h-100"><div class="hw-title mb-3">Sesi Terbaru</div>@forelse($sesiList->take(4) as $sesi)<div class="d-flex align-items-center gap-3 py-2" style="border-bottom:1px solid #F3F9F6"><i class="bi bi-camera-fill" style="color:var(--hw-green-400)"></i><div class="flex-grow-1"><div class="fw-bold" style="font-size:.84rem">{{ $sesi->waktu_foto->translatedFormat('d M Y, H:i') }}</div><div class="hw-sub">{{ ucfirst(str_replace('_', ' ', $sesi->status)) }}</div></div><a class="btn btn-hw-outline btn-sm" href="{{ route('admin.responden.show', $sesi) }}">Lihat</a></div>@empty<div class="hw-note">Belum ada sesi makan yang tercatat.</div>@endforelse<div class="mt-3"><a class="btn btn-hw-outline w-100" href="{{ route('admin.responden.index') }}">Lihat seluruh riwayat</a></div></div></div>
+    <div class="col-12 col-xl-5">
+      <div class="hw-card hw-card-pad h-100">
+        <div class="hw-title mb-3">Sesi Terbaru</div>
+        @forelse($sesiList->take(4) as $sesi)
+          <div class="d-flex align-items-center gap-3 py-2" style="border-bottom:1px solid #F3F9F6">
+            <i class="bi bi-camera-fill" style="color:var(--hw-green-400)"></i>
+            <div class="flex-grow-1">
+              <div class="fw-bold" style="font-size:.84rem">{{ $sesi->waktu_foto->translatedFormat('d M Y, H:i') }}</div>
+              <div class="hw-sub">{{ ucfirst(str_replace('_', ' ', $sesi->status)) }}</div>
+            </div>
+            @if(isset($isAdminView) && $isAdminView)
+              <a class="btn btn-hw-outline btn-sm" href="{{ route('admin.users.session.show', [$user, $sesi]) }}">Lihat</a>
+            @else
+              <a class="btn btn-hw-outline btn-sm" href="{{ route('admin.responden.show', $sesi) }}">Lihat</a>
+            @endif
+          </div>
+        @empty
+          <div class="hw-note">Belum ada sesi makan yang tercatat.</div>
+        @endforelse
+        @if(!isset($isAdminView) || !$isAdminView)
+          <div class="mt-3">
+            <a class="btn btn-hw-outline w-100" href="{{ route('admin.responden.index') }}">Lihat seluruh riwayat</a>
+          </div>
+        @endif
+      </div>
+    </div>
   </div>
 @endsection

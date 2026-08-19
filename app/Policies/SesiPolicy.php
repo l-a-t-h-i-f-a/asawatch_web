@@ -9,16 +9,16 @@ class SesiPolicy
 {
     public function view(User $user, Sesi $sesi): bool
     {
-        return $user->id === $sesi->user_id;
+        return $user->isAdmin() || $user->id === $sesi->user_id;
     }
 
     public function update(User $user, Sesi $sesi): bool
     {
-        return $user->id === $sesi->user_id;
+        return $user->isAdmin() || $user->id === $sesi->user_id;
     }
 
     public function delete(User $user, Sesi $sesi): bool
     {
-        return $user->id === $sesi->user_id;
+        return $user->isAdmin() || $user->id === $sesi->user_id;
     }
 }
