@@ -3,80 +3,135 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Perangkat;
+use App\Models\Sampel;
+use App\Models\Sesi;
+use App\Models\User;
+use App\Support\LingkupResponden;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * Versi web dari GET /api/v1/akun/ekspor (bagian 9 dokumen API) — hak
- * pengguna untuk mengunduh seluruh datanya sendiri, bukan fitur tambahan.
+ * Ekspor data penelitian: seluruh responden, atau satu responden saja bila
+ * dipilih lewat "?responden=". Akun administrator tidak pernah ikut karena
+ * tidak memiliki data pengukuran.
  */
 class ExportController extends Controller
 {
+    private const KOLOM_CSV = [
+        'user_id', 'nama', 'email', 'sesi_id', 'waktu_foto', 'status_sesi',
+        'index', 'detik_relatif_t0', 'status_sampel', 'gula_darah',
+        'detak_jantung', 'sistolik', 'diastolik', 'spo2',
+    ];
+
     public function index(Request $request)
     {
-        $user = $request->user();
+        $lingkup = LingkupResponden::dari($request);
+        $ids = $lingkup->ids();
 
         return view('admin.ekspor.index', [
             'active' => 'ekspor',
-            'totalSesi' => $user->sesi()->count(),
-            'totalKalibrasi' => $user->kalibrasi()->count(),
-            'totalPerangkat' => $user->perangkat()->count(),
+            'lingkup' => $lingkup,
+            'totalResponden' => $lingkup->jumlahResponden(),
+            'totalSesi' => Sesi::whereIn('user_id', $ids)->count(),
+            'totalTitikData' => Sampel::whereHas('sesi', fn ($q) => $q->whereIn('user_id', $ids))
+                ->where('status', 'terisi')
+                ->count(),
+            'totalPerangkat' => Perangkat::whereIn('user_id', $ids)->count(),
         ]);
     }
 
-    public function downloadJson(Request $request)
+    public function downloadJson(Request $request): StreamedResponse
     {
-        $user = $request->user()->load([
-            'profil',
-            'sesi.sampel',
-            'sesi.hasilDeteksi.itemMakanan',
-            'kalibrasi',
-            'perangkat',
-        ]);
+        $lingkup = LingkupResponden::dari($request);
+        $nama = "asawatch_{$lingkup->slug()}_".now()->format('Y-m-d').'.json';
 
-        $data = [
-            'profil' => $user->profil,
-            'sesi' => $user->sesi,
-            'kalibrasi' => $user->kalibrasi,
-            'perangkat' => $user->perangkat,
-        ];
+        return response()->streamDownload(function () use ($lingkup) {
+            $out = fopen('php://output', 'w');
 
-        $nama = 'asawatch_data_'.now()->format('Y-m-d').'.json';
+            fwrite($out, '{"diekspor_pada":'.json_encode(now()->toIso8601String()));
+            fwrite($out, ',"lingkup":'.json_encode($lingkup->label()));
+            fwrite($out, ',"responden":[');
 
-        return response()->streamDownload(
-            fn () => print(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)),
-            $nama,
-            ['Content-Type' => 'application/json'],
-        );
+            // Ditulis per potong supaya ekspor lintas responden tidak menahan
+            // seluruh dataset (sesi + sampel + item makanan) di memori.
+            $pertama = true;
+            $this->potongResponden($lingkup, function (User $user) use ($out, &$pertama) {
+                fwrite($out, $pertama ? '' : ',');
+                $pertama = false;
+
+                fwrite($out, json_encode([
+                    'id' => $user->id,
+                    'nama' => $user->nama,
+                    'email' => $user->email,
+                    'terdaftar_pada' => $user->created_at,
+                    'profil' => $user->profil,
+                    'sesi' => $user->sesi,
+                    'kalibrasi' => $user->kalibrasi,
+                    'perangkat' => $user->perangkat,
+                ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            }, ['profil', 'sesi.sampel', 'sesi.hasilDeteksi.itemMakanan', 'kalibrasi', 'perangkat']);
+
+            fwrite($out, ']}');
+            fclose($out);
+        }, $nama, ['Content-Type' => 'application/json']);
     }
 
     public function downloadCsv(Request $request): StreamedResponse
     {
-        $user = $request->user();
-        $nama = 'asawatch_sampel_'.now()->format('Y-m-d').'.csv';
+        $lingkup = LingkupResponden::dari($request);
+        $nama = "asawatch_sampel_{$lingkup->slug()}_".now()->format('Y-m-d').'.csv';
 
-        $sampel = $user->sesi()->with('sampel')->get()->flatMap(fn ($sesi) => $sesi->sampel->map(fn ($s) => [
-            'sesi_id' => $sesi->id,
-            'waktu_foto' => $sesi->waktu_foto,
-            'index' => $s->index,
-            'detik_relatif_t0' => $s->detik_relatif_t0,
-            'status' => $s->status,
-            'gula_darah' => $s->gula_darah,
-            'detak_jantung' => $s->detak_jantung,
-            'sistolik' => $s->sistolik,
-            'diastolik' => $s->diastolik,
-            'spo2' => $s->spo2,
-        ]));
-
-        return response()->streamDownload(function () use ($sampel) {
+        return response()->streamDownload(function () use ($lingkup) {
             $out = fopen('php://output', 'w');
-            fputcsv($out, ['sesi_id', 'waktu_foto', 'index', 'detik_relatif_t0', 'status', 'gula_darah', 'detak_jantung', 'sistolik', 'diastolik', 'spo2']);
+            fputcsv($out, self::KOLOM_CSV);
 
-            foreach ($sampel as $baris) {
-                fputcsv($out, $baris);
-            }
+            $this->potongResponden($lingkup, function (User $user) use ($out) {
+                foreach ($user->sesi as $sesi) {
+                    foreach ($sesi->sampel as $s) {
+                        fputcsv($out, [
+                            $user->id,
+                            $user->nama,
+                            $user->email,
+                            $sesi->id,
+                            $sesi->waktu_foto?->toIso8601String(),
+                            $sesi->status,
+                            $s->index,
+                            $s->detik_relatif_t0,
+                            $s->status,
+                            $s->gula_darah,
+                            $s->detak_jantung,
+                            $s->sistolik,
+                            $s->diastolik,
+                            $s->spo2,
+                        ]);
+                    }
+                }
+            }, ['sesi.sampel']);
 
             fclose($out);
         }, $nama, ['Content-Type' => 'text/csv']);
+    }
+
+    /**
+     * Jalankan $tulis untuk tiap responden dalam lingkup, 50 akun sekaligus.
+     *
+     * Potongan diambil dari daftar id yang sudah terurut nama, bukan lewat
+     * chunkById — chunkById memaksa paging per id sehingga urutan nama hanya
+     * berlaku di dalam satu potongan, tidak di keseluruhan berkas.
+     */
+    private function potongResponden(LingkupResponden $lingkup, callable $tulis, array $relasi): void
+    {
+        foreach ($lingkup->ids()->chunk(50) as $idPotongan) {
+            $responden = User::responden()
+                ->whereIn('id', $idPotongan)
+                ->with($relasi)
+                ->get()
+                ->sortBy('nama');
+
+            foreach ($responden as $user) {
+                $tulis($user);
+            }
+        }
     }
 }

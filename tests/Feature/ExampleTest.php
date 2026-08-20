@@ -14,6 +14,8 @@ class ExampleTest extends TestCase
     {
         $response = $this->get('/');
 
-        $response->assertStatus(200);
+        // Akar situs memang mengarahkan ke halaman masuk admin — tidak ada
+        // landing page publik di aplikasi ini.
+        $response->assertRedirect(route('admin.login'));
     }
 }

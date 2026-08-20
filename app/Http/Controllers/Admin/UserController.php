@@ -3,17 +3,23 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\Sampel;
 use App\Models\Sesi;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
     public function index(Request $request)
     {
-        abort_unless(auth()->user()?->isAdmin(), 403);
-
-        $query = User::with(['profil', 'perangkat'])->where('email', '!=', 'admin@asawatch.com');
+        $query = User::responden()
+            ->with([
+                'profil',
+                // Diurutkan supaya perangkat->first() di tabel benar-benar
+                // perangkat yang terakhir tersambung, bukan urutan acak.
+                'perangkat' => fn ($q) => $q->orderByDesc('terakhir_tersambung'),
+            ])
+            ->withCount(['sesi', 'sesi as sesi_selesai_count' => fn ($q) => $q->where('status', 'selesai')]);
 
         if ($search = $request->query('search')) {
             $query->where(fn ($q) => $q->where('nama', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"));
@@ -30,39 +36,50 @@ class UserController extends Controller
 
     public function show(User $user)
     {
-        abort_unless(auth()->user()?->isAdmin(), 403);
+        abort_if($user->isAdmin(), 404);
 
-        if ($user->isAdmin()) {
-            abort(404);
-        }
+        $user->load(['profil', 'perangkat' => fn ($query) => $query->latest('terakhir_tersambung')])
+            ->loadCount(['sesi', 'sesi as sesi_selesai_count' => fn ($q) => $q->where('status', 'selesai')]);
 
-        $user->load(['profil', 'perangkat' => fn ($query) => $query->latest('terakhir_tersambung')]);
-
-        $sesi = $user->sesi()
-            ->with(['sampel', 'hasilDeteksi.itemMakanan'])
+        // Hanya sesi yang benar-benar ditampilkan yang dimuat — sebelumnya
+        // seluruh riwayat responden (beserta sampel dan item makanannya)
+        // ditarik ke memori hanya untuk mengambil 8 teratas dan menghitung.
+        $sesiList = $user->sesi()
+            ->with('sampel')
             ->orderByDesc('waktu_foto')
+            ->take(8)
             ->get();
 
-        $sampelTerbaru = $sesi
-            ->flatMap->sampel
-            ->filter(fn ($sampel) => $sampel->detak_jantung || $sampel->gula_darah || $sampel->sistolik)
-            ->sortByDesc('created_at')
+        // Pengukuran terakhir dicari lewat query, bukan dari 8 sesi di atas —
+        // sesi terbaru bisa saja belum punya sampel terisi sama sekali.
+        $sampelTerbaru = Sampel::query()
+            ->join('sesi', 'sesi.id', '=', 'sampel.sesi_id')
+            ->whereNull('sesi.deleted_at')
+            ->where('sesi.user_id', $user->id)
+            ->where('sampel.status', 'terisi')
+            ->where(function ($q) {
+                $q->whereNotNull('sampel.detak_jantung')
+                    ->orWhereNotNull('sampel.gula_darah')
+                    ->orWhereNotNull('sampel.sistolik');
+            })
+            ->orderByDesc('sesi.waktu_foto')
+            ->orderByDesc('sampel.index')
+            ->select('sampel.*')
             ->first();
 
-        return view('admin.responden.detail', [
+        return view('admin.users.show', [
             'active' => 'users',
             'user' => $user,
-            'sesiList' => $sesi,
-            'totalSesi' => $user->sesi()->count(),
-            'sesiSelesai' => $user->sesi()->where('status', 'selesai')->count(),
+            'sesiList' => $sesiList,
+            'totalSesi' => $user->sesi_count,
+            'sesiSelesai' => $user->sesi_selesai_count,
             'sampelTerbaru' => $sampelTerbaru,
-            'isAdminView' => true,
         ]);
     }
 
     public function showSession(User $user, Sesi $sesi)
     {
-        abort_unless(auth()->user()?->isAdmin(), 403);
+        abort_if($user->isAdmin(), 404);
 
         if ($sesi->user_id !== $user->id) {
             abort(404);
@@ -70,11 +87,9 @@ class UserController extends Controller
 
         $sesi->load(['sampel', 'hasilDeteksi.itemMakanan']);
 
-        return view('admin.responden.show', [
+        return view('admin.users.session', [
             'active' => 'users',
             'sesi' => $sesi,
-            'totalSesi' => $user->sesi()->count(),
-            'isAdminView' => true,
             'selectedUser' => $user,
         ]);
     }

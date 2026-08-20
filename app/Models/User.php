@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use App\Notifications\AturUlangSandiNotification;
+use App\Support\Peran;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -20,6 +22,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * The attributes that are mass assignable.
+     *
+     * Catatan: 'peran' sengaja tidak ada di sini. Kolom itu menentukan hak
+     * akses, jadi tidak boleh ikut terisi dari input request mana pun --
+     * naikkan peran lewat setPeran()/perintah artisan, bukan mass assignment.
      *
      * @var list<string>
      */
@@ -49,6 +55,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'peran' => Peran::class,
         ];
     }
 
@@ -79,7 +86,29 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function isAdmin(): bool
     {
-        return $this->email === 'admin@asawatch.com';
+        return $this->peran === Peran::ADMIN;
+    }
+
+    /**
+     * Semua akun berperan responden — dipakai di seluruh panel web, yang
+     * memang hanya menampilkan data responden (bukan data admin sendiri).
+     */
+    public function scopeResponden(Builder $query): Builder
+    {
+        return $query->where('peran', Peran::RESPONDEN);
+    }
+
+    public function scopeAdmin(Builder $query): Builder
+    {
+        return $query->where('peran', Peran::ADMIN);
+    }
+
+    /** Ubah peran akun. Sengaja eksplisit, di luar jalur mass assignment. */
+    public function setPeran(Peran $peran): bool
+    {
+        $this->peran = $peran;
+
+        return $this->save();
     }
 
     public function sendPasswordResetNotification($token): void

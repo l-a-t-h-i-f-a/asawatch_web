@@ -19,11 +19,7 @@
 
 @section('content')
 
-  @if(isset($isAdminView) && $isAdminView)
-    <a class="fw-bold text-decoration-none d-inline-flex align-items-center gap-2" href="{{ route('admin.users.show', $selectedUser) }}" style="font-size:.84rem"><i class="bi bi-arrow-left"></i> Kembali ke detail responden</a>
-  @else
-    <a class="fw-bold text-decoration-none d-inline-flex align-items-center gap-2" href="{{ route('admin.responden.index') }}" style="font-size:.84rem"><i class="bi bi-arrow-left"></i> Kembali ke riwayat sesi</a>
-  @endif
+  <a class="fw-bold text-decoration-none d-inline-flex align-items-center gap-2" href="{{ route('admin.users.show', $selectedUser) }}" style="font-size:.84rem"><i class="bi bi-arrow-left"></i> Kembali ke detail responden</a>
 
   <div class="hw-card hw-card-pad d-flex gap-3 align-items-center flex-wrap">
     <div class="hw-icon-box" style="width:64px;height:64px;border-radius:20px;font-size:1.4rem;background:var(--hw-tint);color:var(--hw-green-600)"><i class="bi bi-camera-fill"></i></div>
@@ -35,6 +31,7 @@
           <span class="hw-pill hw-pill-warn">Waktu tidak pasti</span>
         @endif
       </div>
+      <div class="hw-sub">Responden: {{ $selectedUser->nama }} · {{ $selectedUser->email }}</div>
       <div class="hw-sub">ID sesi: {{ $sesi->id }}</div>
       <div class="hw-sub">t0: {{ $sesi->t0?->translatedFormat('d M Y, H:i') ?? 'Belum ditekan di jam' }}</div>
     </div>

@@ -18,17 +18,17 @@
       <div class="hw-brand-mark" style="background:rgba(255,255,255,.15);box-shadow:none"><i class="bi bi-heart-pulse-fill"></i></div>
       <div>
         <div class="hw-brand-name text-white">Asa<span style="color:var(--hw-mint)">Watch</span></div>
-        <div class="hw-brand-sub" style="color:rgba(234,247,240,.7)">Portal Web Pribadi</div>
+        <div class="hw-brand-sub" style="color:rgba(234,247,240,.7)">Panel Administrator</div>
       </div>
     </div>
 
     <div class="position-relative d-flex flex-column gap-3" style="max-width:440px">
-      <div class="hw-login-head">Riwayat sesi makan dan responsmu, tersimpan rapi di satu tempat.</div>
-      <div style="font-size:.95rem;line-height:1.65;color:rgba(234,247,240,.82)">Lihat riwayat sesi, kalibrasi tensi, dan unduh datamu sendiri — masuk dengan akun AsaWatch yang sama dengan aplikasi mobile.</div>
+      <div class="hw-login-head">Data sesi makan seluruh responden, terkumpul rapi di satu tempat.</div>
+      <div style="font-size:.95rem;line-height:1.65;color:rgba(234,247,240,.82)">Pantau responden, telusuri tiap sesi pengukuran, dan ekspor datanya untuk dianalisis. Khusus akun administrator.</div>
       <div class="d-flex flex-column gap-2 mt-2">
-        <div class="d-flex align-items-center gap-3" style="font-size:.88rem;color:rgba(234,247,240,.9)"><span class="hw-icon-box" style="width:26px;height:26px;flex:0 0 26px;border-radius:9px;background:rgba(126,227,176,.2);color:var(--hw-mint);font-size:.8rem"><i class="bi bi-activity"></i></span>4 titik pengukuran per sesi makan, dari jam tanganmu</div>
-        <div class="d-flex align-items-center gap-3" style="font-size:.88rem;color:rgba(234,247,240,.9)"><span class="hw-icon-box" style="width:26px;height:26px;flex:0 0 26px;border-radius:9px;background:rgba(126,227,176,.2);color:var(--hw-mint);font-size:.8rem"><i class="bi bi-shield-lock"></i></span>Hanya kamu yang bisa melihat datamu sendiri</div>
-        <div class="d-flex align-items-center gap-3" style="font-size:.88rem;color:rgba(234,247,240,.9)"><span class="hw-icon-box" style="width:26px;height:26px;flex:0 0 26px;border-radius:9px;background:rgba(126,227,176,.2);color:var(--hw-mint);font-size:.8rem"><i class="bi bi-cloud-arrow-down"></i></span>Ekspor data pribadi kapan saja</div>
+        <div class="d-flex align-items-center gap-3" style="font-size:.88rem;color:rgba(234,247,240,.9)"><span class="hw-icon-box" style="width:26px;height:26px;flex:0 0 26px;border-radius:9px;background:rgba(126,227,176,.2);color:var(--hw-mint);font-size:.8rem"><i class="bi bi-activity"></i></span>4 titik pengukuran per sesi makan, langsung dari perangkat responden</div>
+        <div class="d-flex align-items-center gap-3" style="font-size:.88rem;color:rgba(234,247,240,.9)"><span class="hw-icon-box" style="width:26px;height:26px;flex:0 0 26px;border-radius:9px;background:rgba(126,227,176,.2);color:var(--hw-mint);font-size:.8rem"><i class="bi bi-shield-lock"></i></span>Akses terbatas untuk administrator</div>
+        <div class="d-flex align-items-center gap-3" style="font-size:.88rem;color:rgba(234,247,240,.9)"><span class="hw-icon-box" style="width:26px;height:26px;flex:0 0 26px;border-radius:9px;background:rgba(126,227,176,.2);color:var(--hw-mint);font-size:.8rem"><i class="bi bi-cloud-arrow-down"></i></span>Ekspor data seluruh responden kapan saja</div>
       </div>
     </div>
   </div>
@@ -38,7 +38,7 @@
       @csrf
       <div>
         <div style="font-size:1.68rem;font-weight:800;letter-spacing:-.7px">Masuk ke Portal</div>
-        <div class="hw-sub" style="font-size:.88rem;line-height:1.55">Gunakan akun AsaWatch yang sama dengan aplikasi mobile.</div>
+        <div class="hw-sub" style="font-size:.88rem;line-height:1.55">Masuk dengan akun administrator AsaWatch.</div>
       </div>
 
       @if ($errors->any())

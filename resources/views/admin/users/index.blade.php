@@ -1,8 +1,8 @@
 @extends('admin.layout')
 
-@section('title', 'Daftar Pengguna · AsaWatch')
-@section('page-title', 'Daftar Pengguna')
-@section('page-subtitle', 'Semua pengguna/responden yang terdaftar dalam sistem AsaWatch')
+@section('title', 'Daftar Responden · AsaWatch')
+@section('page-title', 'Daftar Responden')
+@section('page-subtitle', 'Semua responden yang terdaftar dalam sistem AsaWatch')
 
 @section('content')
 
@@ -30,8 +30,8 @@
             @php
               $inisial = \Illuminate\Support\Str::of($user->nama)->explode(' ')->filter()->map(fn ($kata) => mb_substr($kata, 0, 1))->take(2)->implode('');
               $perangkat = $user->perangkat->first();
-              $totalSesi = $user->sesi()->count();
-              $sesiSelesai = $user->sesi()->where('status', 'selesai')->count();
+              $totalSesi = $user->sesi_count;
+              $sesiSelesai = $user->sesi_selesai_count;
             @endphp
             <tr>
               <td>
@@ -67,13 +67,13 @@
               </td>
             </tr>
           @empty
-            <tr><td colspan="5" class="text-center text-muted py-4">Tidak ada pengguna ditemukan.</td></tr>
+            <tr><td colspan="5" class="text-center text-muted py-4">Tidak ada responden ditemukan.</td></tr>
           @endforelse
         </tbody>
       </table>
     </div>
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-3 px-1">
-      <div style="font-size:.8rem;color:var(--hw-muted)">Menampilkan {{ $users->count() }} dari {{ $users->total() }} pengguna</div>
+      <div style="font-size:.8rem;color:var(--hw-muted)">Menampilkan {{ $users->count() }} dari {{ $users->total() }} responden</div>
       {{ $users->onEachSide(1)->links() }}
     </div>
   </div>
