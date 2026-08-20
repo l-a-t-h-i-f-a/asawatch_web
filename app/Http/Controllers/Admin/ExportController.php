@@ -15,11 +15,15 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  * Ekspor data penelitian: seluruh responden, atau satu responden saja bila
  * dipilih lewat "?responden=". Akun administrator tidak pernah ikut karena
  * tidak memiliki data pengukuran.
+ *
+ * Kolom/field sesi_uji ikut diekspor sebagai penanda sesi pengujian (jadwal
+ * dimampatkan atau perangkat palsu). Penanda saja — tidak ada satu pun angka
+ * di panel yang menyaring berdasarkan kolom ini.
  */
 class ExportController extends Controller
 {
     private const KOLOM_CSV = [
-        'user_id', 'nama', 'email', 'sesi_id', 'waktu_foto', 'status_sesi',
+        'user_id', 'nama', 'email', 'sesi_id', 'waktu_foto', 'status_sesi', 'sesi_uji',
         'index', 'detik_relatif_t0', 'status_sampel', 'gula_darah',
         'detak_jantung', 'sistolik', 'diastolik', 'spo2',
     ];
@@ -34,6 +38,7 @@ class ExportController extends Controller
             'lingkup' => $lingkup,
             'totalResponden' => $lingkup->jumlahResponden(),
             'totalSesi' => Sesi::whereIn('user_id', $ids)->count(),
+            'totalSesiUji' => Sesi::whereIn('user_id', $ids)->where('sesi_uji', true)->count(),
             'totalTitikData' => Sampel::whereHas('sesi', fn ($q) => $q->whereIn('user_id', $ids))
                 ->where('status', 'terisi')
                 ->count(),
@@ -96,6 +101,7 @@ class ExportController extends Controller
                             $sesi->id,
                             $sesi->waktu_foto?->toIso8601String(),
                             $sesi->status,
+                            $sesi->sesi_uji ? 1 : 0,
                             $s->index,
                             $s->detik_relatif_t0,
                             $s->status,

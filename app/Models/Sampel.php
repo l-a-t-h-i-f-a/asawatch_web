@@ -2,13 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Composite primary key (sesi_id, index) — Eloquent has no native support
- * for this, so lookups/updates are always done via explicit where() calls
- * rather than find()/save() on the model key.
+ * for this. $primaryKey hanya bisa menampung satu kolom, jadi tanpa
+ * penyesuaian di bawah setiap UPDATE hasil save()/updateOrCreate() akan
+ * berbunyi "where sesi_id = ?" saja dan menimpa keempat baris sampel milik
+ * sesi itu sekaligus. setKeysForSaveQuery()/setKeysForSelectQuery()
+ * menambahkan `index` ke klausa kunci supaya satu baris saja yang kena.
+ *
+ * Lookups tetap lewat where() eksplisit, bukan find().
  */
 class Sampel extends Model
 {
@@ -38,6 +44,25 @@ class Sampel extends Model
         return [
             'dari_buffer' => 'boolean',
         ];
+    }
+
+    /**
+     * Kunci baris = (sesi_id, index). Dipakai Eloquent untuk UPDATE/DELETE
+     * saat save() atau updateOrCreate().
+     */
+    protected function setKeysForSaveQuery($query)
+    {
+        return $this->tambahKunciIndex(parent::setKeysForSaveQuery($query));
+    }
+
+    protected function setKeysForSelectQuery($query)
+    {
+        return $this->tambahKunciIndex(parent::setKeysForSelectQuery($query));
+    }
+
+    private function tambahKunciIndex(Builder $query): Builder
+    {
+        return $query->where('index', $this->getOriginal('index', $this->index));
     }
 
     public function sesi(): BelongsTo

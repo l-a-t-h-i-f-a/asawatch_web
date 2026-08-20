@@ -21,6 +21,7 @@ class SinkronRequest extends FormRequest
             'data.sesi.*.t0' => ['nullable', 'date'],
             'data.sesi.*.status' => ['required', 'in:draft,menunggu_perangkat,berjalan,selesai,tidak_lengkap,dibatalkan'],
             'data.sesi.*.waktu_tidak_pasti' => ['nullable', 'boolean'],
+            'data.sesi.*.sesi_uji' => ['nullable', 'boolean'],
             'data.sesi.*.diperbarui_pada' => ['nullable', 'date'],
             'data.sesi.*.dihapus_pada' => ['nullable', 'date'],
             'data.sesi.*.sampel' => ['nullable', 'array', 'max:4'],

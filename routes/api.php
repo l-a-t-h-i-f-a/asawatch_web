@@ -29,7 +29,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         });
     });
 
-    Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('profil', [ProfilController::class, 'show'])->name('profil.show');
         Route::put('profil', [ProfilController::class, 'update'])->name('profil.update');
 

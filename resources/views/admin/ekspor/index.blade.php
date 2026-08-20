@@ -33,7 +33,7 @@
 
         <div class="hw-note d-flex gap-2">
           <i class="bi bi-info-circle" style="color:var(--hw-green-400)"></i>
-          <div>JSON berisi struktur lengkap per responden (profil, sesi, hasil analisis nutrisi, kalibrasi, perangkat). CSV berisi satu baris per titik pengukuran, lengkap dengan identitas responden — cocok dibuka di Excel/SPSS. Kedua berkas mengikuti lingkup yang dipilih di atas.</div>
+          <div>JSON berisi struktur lengkap per responden (profil, sesi, hasil analisis nutrisi, kalibrasi, perangkat). CSV berisi satu baris per titik pengukuran, lengkap dengan identitas responden — cocok dibuka di Excel/SPSS. Kedua berkas mengikuti lingkup yang dipilih di atas. Sesi uji (jadwal dimampatkan atau perangkat palsu) ditandai kolom <code>sesi_uji</code> bernilai 1.</div>
         </div>
       </div>
     </div>
@@ -48,6 +48,10 @@
         <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid #F3F9F6">
           <span style="font-size:.84rem;color:var(--hw-ink-2)">Total sesi</span>
           <span class="fw-bold" style="font-size:.84rem">{{ $totalSesi }}</span>
+        </div>
+        <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid #F3F9F6">
+          <span style="font-size:.84rem;color:var(--hw-ink-2)">Di antaranya sesi uji</span>
+          <span class="fw-bold" style="font-size:.84rem">{{ $totalSesiUji }}</span>
         </div>
         <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid #F3F9F6">
           <span style="font-size:.84rem;color:var(--hw-ink-2)">Titik pengukuran terisi</span>

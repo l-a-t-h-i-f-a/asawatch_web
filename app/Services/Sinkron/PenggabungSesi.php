@@ -73,6 +73,11 @@ class PenggabungSesi
             $sesi->t0 = $data['t0'] ?? null;
             $sesi->status = $data['status'];
 
+            // Penanda sesi pengujian ikut apa adanya dari klien — tidak ada
+            // aturan "sekali true selamanya true" di sini, sesi yang salah
+            // ditandai harus bisa dikoreksi dari app.
+            $sesi->sesi_uji = (bool) ($data['sesi_uji'] ?? $sesi->sesi_uji ?? false);
+
             // Aturan 4: sekali true, server tidak pernah mengembalikannya ke false.
             $sesi->waktu_tidak_pasti = (bool) ($sesi->waktu_tidak_pasti || ($data['waktu_tidak_pasti'] ?? false));
 
@@ -130,19 +135,26 @@ class PenggabungSesi
             return;
         }
 
-        Sampel::updateOrCreate(
-            ['sesi_id' => $sesiId, 'index' => $s['index']],
-            [
-                'detik_relatif_t0' => $s['detik_relatif_t0'] ?? self::OFFSET_KANONIS[$s['index']] ?? 0,
-                'status' => $s['status'],
-                'dari_buffer' => $s['dari_buffer'] ?? false,
-                'gula_darah' => $s['gula_darah'] ?? null,
-                'detak_jantung' => $s['detak_jantung'] ?? null,
-                'sistolik' => $s['sistolik'] ?? null,
-                'diastolik' => $s['diastolik'] ?? null,
-                'spo2' => $s['spo2'] ?? null,
-            ]
-        );
+        $atribut = [
+            'detik_relatif_t0' => $s['detik_relatif_t0'] ?? self::OFFSET_KANONIS[$s['index']] ?? 0,
+            'status' => $s['status'],
+            'dari_buffer' => $s['dari_buffer'] ?? false,
+            'gula_darah' => $s['gula_darah'] ?? null,
+            'detak_jantung' => $s['detak_jantung'] ?? null,
+            'sistolik' => $s['sistolik'] ?? null,
+            'diastolik' => $s['diastolik'] ?? null,
+            'spo2' => $s['spo2'] ?? null,
+        ];
+
+        // Kunci baris selalu pasangan (sesi_id, index) — lihat catatan di
+        // model Sampel: memakai sesi_id saja menimpa keempat slot sekaligus.
+        if ($ada) {
+            Sampel::where('sesi_id', $sesiId)->where('index', $s['index'])->update($atribut);
+
+            return;
+        }
+
+        Sampel::create($atribut + ['sesi_id' => $sesiId, 'index' => $s['index']]);
     }
 
     /**

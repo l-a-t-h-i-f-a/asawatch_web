@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
  * Statistik deskriptif responden — seluruhnya, atau satu responden bila
  * dipilih lewat "?responden=". Angka di sini murni ringkasan data tersimpan,
  * bukan rumus turunan milik aplikasi dan bukan kesimpulan medis.
+
  */
 class AnalyticsController extends Controller
 {

@@ -19,6 +19,7 @@ class SesiResource extends JsonResource
             't0' => Waktu::iso($this->t0),
             'status' => $this->status,
             'waktu_tidak_pasti' => (bool) $this->waktu_tidak_pasti,
+            'sesi_uji' => (bool) $this->sesi_uji,
             'foto' => $this->foto_disk_path ? [
                 'url' => URL::temporarySignedRoute('api.v1.foto.show', $kadaluarsa, ['sesi' => $this->id]),
                 'kadaluarsa_pada' => Waktu::iso($kadaluarsa),

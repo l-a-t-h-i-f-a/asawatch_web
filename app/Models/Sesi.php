@@ -35,6 +35,7 @@ class Sesi extends Model
         't0',
         'status',
         'waktu_tidak_pasti',
+        'sesi_uji',
     ];
 
     protected function casts(): array
@@ -43,6 +44,7 @@ class Sesi extends Model
             'waktu_foto' => 'datetime',
             't0' => 'datetime',
             'waktu_tidak_pasti' => 'boolean',
+            'sesi_uji' => 'boolean',
             'deleted_at' => 'datetime',
         ];
     }

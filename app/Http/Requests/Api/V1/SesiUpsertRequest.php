@@ -18,6 +18,7 @@ class SesiUpsertRequest extends FormRequest
             't0' => ['nullable', 'date'],
             'status' => ['required', 'in:draft,menunggu_perangkat,berjalan,selesai,tidak_lengkap,dibatalkan'],
             'waktu_tidak_pasti' => ['nullable', 'boolean'],
+            'sesi_uji' => ['nullable', 'boolean'],
             'diperbarui_pada' => ['nullable', 'date'],
             'dihapus_pada' => ['nullable', 'date'],
 
