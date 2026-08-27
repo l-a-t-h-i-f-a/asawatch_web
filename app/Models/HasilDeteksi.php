@@ -27,6 +27,7 @@ class HasilDeteksi extends Model
         'total_lemak',
         'total_gula_total',
         'total_serat',
+        'zat_tidak_lengkap',
     ];
 
     protected function casts(): array
@@ -40,6 +41,7 @@ class HasilDeteksi extends Model
             'total_lemak' => 'float',
             'total_gula_total' => 'float',
             'total_serat' => 'float',
+            'zat_tidak_lengkap' => 'array',
         ];
     }
 

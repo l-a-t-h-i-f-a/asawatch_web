@@ -15,6 +15,27 @@
       default => ucfirst($status),
   };
   $labelTitik = ['Baseline', 'Selesai Makan (t0)', '+1 Jam', '+2 Jam'];
+  $fotoUrl = $sesi->foto_disk_path ? route('admin.users.session.foto', [$selectedUser, $sesi]) : null;
+  // null pada nilai gizi berarti "tidak diketahui" — makanan di luar tabel
+  // TKPI, atau zat yang tabelnya memang tidak punya kolomnya (gula). Jangan
+  // dicetak sebagai kosong, apalagi sebagai nol.
+  $angka = fn ($nilai, $satuan = '') => $nilai === null ? '—' : $nilai . $satuan;
+  $tidakLengkap = $sesi->hasilDeteksi?->zat_tidak_lengkap ?? [];
+  // Padanan longgar sengaja ditandai berbeda: angkanya sah dipakai, tapi saat
+  // analisis nanti harus bisa dipisahkan dari yang cocok persis.
+  $labelCocok = [
+      'tepat' => ['Cocok persis', 'hw-pill-ok'],
+      'alias' => ['Lewat alias', 'hw-pill-ok'],
+      'generik' => ['Padanan generik', 'hw-pill-warn'],
+      // Dicocokkan otomatis oleh LLM saat permintaan berjalan, belum pernah
+      // diperiksa siapa pun. Angkanya sah dipakai, tapi inilah baris yang
+      // perlu disisir sebelum datanya dianggap final.
+      'alias_llm' => ['Otomatis, belum diperiksa', 'hw-pill-bad'],
+  ];
+  $labelZat = [
+      'kalori' => 'kalori', 'karbohidrat' => 'karbohidrat', 'protein' => 'protein',
+      'lemak' => 'lemak', 'gula_total' => 'gula', 'serat' => 'serat',
+  ];
 @endphp
 
 @section('content')
@@ -64,12 +85,30 @@
   </div>
 
   <div class="hw-card hw-card-pad">
-    <div class="hw-title mb-3">Hasil Analisis Nutrisi</div>
+    <div class="hw-title mb-3">Foto Makanan &amp; Hasil Analisis Nutrisi</div>
+    <div class="row g-4">
+      <div class="col-12 col-lg-4">
+        @if ($fotoUrl)
+          {{-- Foto ada di disk privat; tautan ini pun hanya bisa dibuka admin yang sedang login. --}}
+          <a href="{{ $fotoUrl }}" target="_blank" rel="noopener" title="Buka foto ukuran penuh">
+            <img src="{{ $fotoUrl }}" alt="Foto makanan sesi {{ $sesi->waktu_foto->translatedFormat('d M Y, H:i') }}"
+                 class="w-100 rounded-4" style="max-height:320px;object-fit:cover;background:var(--hw-tint)">
+          </a>
+          <div class="hw-sub mt-2">Foto yang dianalisis · klik untuk ukuran penuh</div>
+        @else
+          <div class="rounded-4 d-grid text-center p-4 h-100"
+               style="background:var(--hw-tint);color:var(--hw-green-600);min-height:180px;align-content:center">
+            <i class="bi bi-image" style="font-size:1.6rem"></i>
+            <div class="hw-sub mt-2">Sesi ini belum mengunggah foto makanan.</div>
+          </div>
+        @endif
+      </div>
+      <div class="col-12 col-lg-8">
     @if ($sesi->hasilDeteksi)
       <div class="d-flex flex-wrap gap-4 mb-3">
         <div>
           <div class="fw-bold" style="font-size:.7rem;color:var(--hw-muted-2);text-transform:uppercase;letter-spacing:.5px">Indeks Glikemik</div>
-          <div class="fw-bold mt-1" style="font-size:.9rem">{{ ucfirst($sesi->hasilDeteksi->indeks_glikemik_perkiraan) }}</div>
+          <div class="fw-bold mt-1" style="font-size:.9rem">{{ $sesi->hasilDeteksi->indeks_glikemik_perkiraan ? ucfirst($sesi->hasilDeteksi->indeks_glikemik_perkiraan) : 'Belum tersedia' }}</div>
         </div>
         <div>
           <div class="fw-bold" style="font-size:.7rem;color:var(--hw-muted-2);text-transform:uppercase;letter-spacing:.5px">Keyakinan</div>
@@ -81,16 +120,44 @@
         </div>
         <div>
           <div class="fw-bold" style="font-size:.7rem;color:var(--hw-muted-2);text-transform:uppercase;letter-spacing:.5px">Total Kalori</div>
-          <div class="fw-bold mt-1" style="font-size:.9rem">{{ $sesi->hasilDeteksi->total_kalori ?? '—' }} kcal</div>
+          <div class="fw-bold mt-1" style="font-size:.9rem">@if (! $sesi->hasilDeteksi->total_kalori)
+              {{-- Nol di sini bukan "tanpa kalori": tidak ada satu pun makanan
+                   yang namanya ketemu di tabel gizi. --}}
+              Belum ada angka
+            @else
+              {{ in_array('kalori', $tidakLengkap) ? '≥ ' : '' }}{{ $sesi->hasilDeteksi->total_kalori }} kcal
+            @endif</div>
         </div>
       </div>
+      @if ($tidakLengkap)
+        {{-- Totalnya jumlah parsial: ada makanan yang tidak menyumbang angka
+             untuk zat-zat ini, jadi angkanya "sekurang-kurangnya sekian". --}}
+        <div class="hw-note mb-3">
+          Total belum lengkap untuk
+          <strong>{{ collect($tidakLengkap)->map(fn ($z) => $labelZat[$z] ?? $z)->join(', ', ' dan ') }}</strong> —
+          ada makanan pada sesi ini yang tidak menyumbang angka untuk zat tersebut.
+        </div>
+      @endif
       <div class="row g-3">
         @foreach ($sesi->hasilDeteksi->itemMakanan as $item)
-          <div class="col-12 col-sm-6 col-xl-3">
+          <div class="col-12 col-sm-6">
             <div class="border rounded-4 p-3 h-100" style="border-color:#EDF6F1!important">
               <div class="fw-bold" style="font-size:.84rem">{{ $item->nama }}</div>
-              <div style="font-size:.78rem;color:var(--hw-muted)" class="mt-2">{{ $item->porsi }} · {{ $item->estimasi_gram }} g</div>
-              <div style="font-size:.78rem;color:var(--hw-muted)" class="mt-1">{{ $item->kalori }} kcal · gula {{ $item->gula_total }} g</div>
+              <div style="font-size:.78rem;color:var(--hw-muted)" class="mt-2">{{ $item->porsi }} · {{ $angka($item->estimasi_gram, ' g') }}</div>
+              @if ($item->sumber_gizi)
+                <div class="mt-2 d-flex align-items-center gap-2 flex-wrap" style="font-size:.72rem;color:var(--hw-muted-2)">
+                  <span>Gizi dari <strong>{{ $item->sumber_gizi }}</strong></span>
+                  @if ($label = $labelCocok[$item->cocok] ?? null)
+                    <span class="hw-pill {{ $label[1] }}" style="font-size:.62rem">{{ $label[0] }}</span>
+                  @endif
+                </div>
+              @endif
+              @if ($item->kalori === null)
+                {{-- Nama makanan tidak ketemu di TKPI, jadi tidak ada angkanya sama sekali. --}}
+                <div style="font-size:.78rem;color:var(--hw-muted-2)" class="mt-1">Gizi tidak ada di tabel TKPI</div>
+              @else
+                <div style="font-size:.78rem;color:var(--hw-muted)" class="mt-1">{{ $angka($item->kalori, ' kcal') }} · gula {{ $angka($item->gula_total, ' g') }}</div>
+              @endif
             </div>
           </div>
         @endforeach
@@ -98,6 +165,8 @@
     @else
       <div class="hw-note">Belum ada hasil analisis nutrisi untuk sesi ini.</div>
     @endif
+      </div>
+    </div>
   </div>
 
 @endsection

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Services\Nutrisi\LayananVisionNutrisi;
+use App\Services\Nutrisi\LayananVisionNutrisiHttp;
 use App\Services\Nutrisi\StubLayananVisionNutrisi;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -17,7 +18,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(LayananVisionNutrisi::class, StubLayananVisionNutrisi::class);
+        $this->app->bind(LayananVisionNutrisi::class, function () {
+            if (config('nutrisi.penyedia') !== 'http') {
+                return new StubLayananVisionNutrisi;
+            }
+
+            return new LayananVisionNutrisiHttp(
+                config('nutrisi.http.url'),
+                config('nutrisi.http.timeout'),
+            );
+        });
     }
 
     /**

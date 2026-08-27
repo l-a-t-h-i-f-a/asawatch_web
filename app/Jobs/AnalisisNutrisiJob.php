@@ -24,7 +24,9 @@ class AnalisisNutrisiJob implements ShouldQueue
 
     public int $tries = 3;
 
-    public int $timeout = 30;
+    // Selaras dengan nutrisi.http.timeout ditambah ruang untuk membaca foto
+    // dari disk — panggilan Gemini pada eval berkisar 2,7-5,1 detik.
+    public int $timeout = 90;
 
     public function __construct(public string $pekerjaanId) {}
 
@@ -72,6 +74,7 @@ class AnalisisNutrisiJob implements ShouldQueue
                         'total_lemak' => $hasil['total']['lemak'],
                         'total_gula_total' => $hasil['total']['gula_total'],
                         'total_serat' => $hasil['total']['serat'],
+                        'zat_tidak_lengkap' => $hasil['zat_tidak_lengkap'] ?? [],
                     ]
                 );
 
@@ -82,6 +85,8 @@ class AnalisisNutrisiJob implements ShouldQueue
                         'sesi_id' => $sesi->id,
                         'urutan' => $urutan,
                         'nama' => $item['nama'],
+                        'sumber_gizi' => $item['sumber_gizi'] ?? null,
+                        'cocok' => $item['cocok'] ?? null,
                         'porsi' => $item['porsi'] ?? null,
                         'estimasi_gram' => $item['estimasi_gram'] ?? null,
                         'kalori' => $item['nutrisi']['kalori'] ?? null,
@@ -132,6 +137,39 @@ class AnalisisNutrisiJob implements ShouldQueue
         return $layanan->analisis(Storage::disk('local')->path($sesi->foto_disk_path));
     }
 
+    /**
+     * Penanda zat tidak lengkap untuk hasil yang dipakai ulang lewat cache
+     * foto. Gabungan dari apa yang tersimpan dan apa yang bisa diturunkan
+     * dari itemnya: satu saja item yang tidak punya angka untuk suatu zat
+     * berarti total zat itu memang tidak lengkap.
+     *
+     * Penurunan ini bukan sekadar pengaman — baris yang dibuat sebelum kolom
+     * ini ada bernilai null, dan tanpa diturunkan ia akan mengaku lengkap.
+     */
+    private function zatTidakLengkap(HasilDeteksi $hasil): array
+    {
+        $peta = [
+            'kalori' => 'kalori',
+            'karbohidrat' => 'karbohidrat',
+            'protein' => 'protein',
+            'lemak' => 'lemak',
+            'gula_total' => 'gula_total',
+            'serat' => 'serat',
+        ];
+
+        $tidakLengkap = array_flip($hasil->zat_tidak_lengkap ?? []);
+
+        foreach ($hasil->itemMakanan as $item) {
+            foreach ($peta as $zat) {
+                if ($item->{$zat} === null) {
+                    $tidakLengkap[$zat] = true;
+                }
+            }
+        }
+
+        return array_values(array_intersect_key($peta, $tidakLengkap));
+    }
+
     private function keArray(HasilDeteksi $hasil): array
     {
         return [
@@ -145,8 +183,11 @@ class AnalisisNutrisiJob implements ShouldQueue
                 'gula_total' => $hasil->total_gula_total,
                 'serat' => $hasil->total_serat,
             ],
+            'zat_tidak_lengkap' => $this->zatTidakLengkap($hasil),
             'makanan' => $hasil->itemMakanan->map(fn ($i) => [
                 'nama' => $i->nama,
+                'sumber_gizi' => $i->sumber_gizi,
+                'cocok' => $i->cocok,
                 'porsi' => $i->porsi,
                 'estimasi_gram' => $i->estimasi_gram,
                 'nutrisi' => [

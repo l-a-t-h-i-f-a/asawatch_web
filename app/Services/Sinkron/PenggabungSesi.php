@@ -2,6 +2,8 @@
 
 namespace App\Services\Sinkron;
 
+use App\Models\HasilDeteksi;
+use App\Models\ItemMakanan;
 use App\Models\Sampel;
 use App\Models\Sesi;
 use App\Support\KodeGalat;
@@ -19,6 +21,10 @@ use Illuminate\Support\Facades\Log;
  * 2. Sisanya last-write-wins per sesi, dibandingkan dengan diperbarui_pada klien.
  * 3. Penghapusan menang atas pembaruan.
  * 4. waktu_tidak_pasti tidak pernah dicabut server (sekali true, selamanya true).
+ * 5. hasil deteksi yang sudah dikoreksi pengguna tidak ditimpa kiriman yang
+ *    tidak dikoreksi (bagian 6, sama seperti AnalisisNutrisiJob).
+ * 6. hasil deteksi kiriman klien hanya diterima kalau dikoreksi_user true —
+ *    selain itu hasil analisis server yang berlaku.
  */
 class PenggabungSesi
 {
@@ -59,6 +65,16 @@ class PenggabungSesi
 
                 // Aturan 2: last-write-wins per sesi.
                 if (! $existing->trashed() && $updatedAtKlien->lt($existing->updated_at)) {
+                    // Kedua stempel ikut dicatat: penolakan 409 tidak terlihat
+                    // di layar app (2xx dianggap sukses), jadi tanpa ini beda
+                    // jam klien-server hanya tampak sebagai "data tidak masuk".
+                    Log::info('Sesi ditolak, stempel klien lebih tua', [
+                        'sesi_id' => $data['id'],
+                        'diperbarui_pada_klien' => $updatedAtKlien->toIso8601String(),
+                        'updated_at_server' => $existing->updated_at->toIso8601String(),
+                        'selisih_detik' => $existing->updated_at->diffInSeconds($updatedAtKlien),
+                    ]);
+
                     return $this->tolak('Ada versi yang lebih baru di server, tarik ulang sebelum mengirim lagi.');
                 }
             }
@@ -89,6 +105,10 @@ class PenggabungSesi
 
             foreach ($data['sampel'] ?? [] as $s) {
                 $this->terapkanSampel($sesi->id, $s);
+            }
+
+            if (is_array($data['hasil'] ?? null)) {
+                $this->terapkanHasil($sesi->id, $data['hasil']);
             }
 
             if ($dihapusPadaKlien && ! $sesi->trashed()) {
@@ -155,6 +175,101 @@ class PenggabungSesi
         }
 
         Sampel::create($atribut + ['sesi_id' => $sesiId, 'index' => $s['index']]);
+    }
+
+    /**
+     * Simpan hasil deteksi yang ikut dikirim klien pada PUT /sesi/{id}
+     * (bagian 5.2 "hasil"). Tanpa ini sesi yang diunduh di perangkat lain
+     * kehilangan kartu gizinya.
+     *
+     * Aturan 5: koreksi pengguna menang — hasil yang sudah dikoreksi di
+     * server tidak boleh ditimpa kiriman yang belum dikoreksi.
+     */
+    private function terapkanHasil(string $sesiId, array $hasil): void
+    {
+        $ada = HasilDeteksi::where('sesi_id', $sesiId)->first();
+        $dikoreksi = (bool) ($hasil['dikoreksi_user'] ?? false);
+
+        // Hasil deteksi itu produk server (bagian 5.2) — satu-satunya alasan
+        // sah klien mengirimkannya kembali adalah koreksi pengguna. Kiriman
+        // tanpa dikoreksi_user hanyalah gema dari hasil server sendiri, dan
+        // menerimanya berbahaya: nilai yang tidak diketahui pulang sebagai nol
+        // kalau klien mengubah null jadi nilai bawaan saat parsing.
+        if (! $dikoreksi) {
+            Log::info('Hasil deteksi kiriman klien diabaikan (bukan koreksi pengguna)', [
+                'sesi_id' => $sesiId,
+                'ada_hasil_server' => (bool) $ada,
+            ]);
+
+            return;
+        }
+
+        if ($ada && $ada->dikoreksi_user && ! $dikoreksi) {
+            Log::info('Percobaan menimpa hasil deteksi terkoreksi diabaikan', ['sesi_id' => $sesiId]);
+
+            return;
+        }
+
+        $total = $hasil['total'] ?? [];
+
+        HasilDeteksi::updateOrCreate(
+            ['sesi_id' => $sesiId],
+            [
+                'indeks_glikemik_perkiraan' => $hasil['indeks_glikemik_perkiraan'] ?? null,
+                'keyakinan' => $hasil['keyakinan'] ?? null,
+                'dikoreksi_user' => $dikoreksi,
+                'total_kalori' => $total['kalori'] ?? null,
+                'total_karbohidrat' => $total['karbohidrat'] ?? null,
+                'total_protein' => $total['protein'] ?? null,
+                'total_lemak' => $total['lemak'] ?? null,
+                'total_gula_total' => $total['gula_total'] ?? null,
+                'total_serat' => $total['serat'] ?? null,
+                'zat_tidak_lengkap' => is_array($hasil['zat_tidak_lengkap'] ?? null)
+                    ? array_values($hasil['zat_tidak_lengkap'])
+                    : ($ada?->zat_tidak_lengkap ?? []),
+            ]
+        );
+
+        // Hanya ganti daftar makanan kalau klien memang mengirimkannya —
+        // hasil tanpa kunci "makanan" bukan berarti makanannya kosong.
+        if (! is_array($hasil['makanan'] ?? null)) {
+            return;
+        }
+
+        // Asal-usul angka gizi (entri TKPI + cara cocok) tidak ada di bagian
+        // 5.2, jadi klien tidak pernah mengirimkannya kembali. Diselamatkan
+        // dulu supaya sinkronisasi biasa tidak menghapusnya; kalau nama
+        // makanannya berubah, catatan lamanya memang tidak berlaku lagi.
+        $asalLama = ItemMakanan::where('sesi_id', $sesiId)
+            ->get()
+            ->keyBy('urutan');
+
+        ItemMakanan::where('sesi_id', $sesiId)->delete();
+
+        // Urutan mengikuti kiriman klien (bagian 8) — pakai "urutan" kalau
+        // dikirim, kalau tidak jatuh ke posisi dalam array.
+        foreach (array_values($hasil['makanan']) as $posisi => $item) {
+            $nutrisi = $item['nutrisi'] ?? [];
+            $urutan = $item['urutan'] ?? $posisi;
+            $lama = $asalLama->get($urutan);
+            $samaNama = $lama && $lama->nama === $item['nama'];
+
+            ItemMakanan::create([
+                'sesi_id' => $sesiId,
+                'urutan' => $urutan,
+                'nama' => $item['nama'],
+                'sumber_gizi' => $samaNama ? $lama->sumber_gizi : null,
+                'cocok' => $samaNama ? $lama->cocok : null,
+                'porsi' => $item['porsi'] ?? null,
+                'estimasi_gram' => $item['estimasi_gram'] ?? null,
+                'kalori' => $nutrisi['kalori'] ?? null,
+                'karbohidrat' => $nutrisi['karbohidrat'] ?? null,
+                'protein' => $nutrisi['protein'] ?? null,
+                'lemak' => $nutrisi['lemak'] ?? null,
+                'gula_total' => $nutrisi['gula_total'] ?? null,
+                'serat' => $nutrisi['serat'] ?? null,
+            ]);
+        }
     }
 
     /**

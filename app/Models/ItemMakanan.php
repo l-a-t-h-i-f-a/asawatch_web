@@ -22,6 +22,8 @@ class ItemMakanan extends Model
         'sesi_id',
         'urutan',
         'nama',
+        'sumber_gizi',
+        'cocok',
         'porsi',
         'estimasi_gram',
         'kalori',

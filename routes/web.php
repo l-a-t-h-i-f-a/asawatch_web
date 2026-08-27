@@ -35,6 +35,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('users', [UserController::class, 'index'])->name('users.index');
         Route::get('users/{user}', [UserController::class, 'show'])->name('users.show');
         Route::get('users/{user}/sesi/{sesi}', [UserController::class, 'showSession'])->name('users.session.show');
+        Route::get('users/{user}/sesi/{sesi}/foto', [UserController::class, 'foto'])->name('users.session.foto');
 
         Route::get('analitik', [AnalyticsController::class, 'index'])->name('analitik');
         Route::get('ekspor', [ExportController::class, 'index'])->name('ekspor.index');

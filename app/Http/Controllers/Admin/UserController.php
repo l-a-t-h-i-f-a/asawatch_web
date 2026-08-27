@@ -7,6 +7,7 @@ use App\Models\Sampel;
 use App\Models\Sesi;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -79,11 +80,7 @@ class UserController extends Controller
 
     public function showSession(User $user, Sesi $sesi)
     {
-        abort_if($user->isAdmin(), 404);
-
-        if ($sesi->user_id !== $user->id) {
-            abort(404);
-        }
+        $this->pastikanSesiMilikResponden($user, $sesi);
 
         $sesi->load(['sampel', 'hasilDeteksi.itemMakanan']);
 
@@ -92,5 +89,30 @@ class UserController extends Controller
             'sesi' => $sesi,
             'selectedUser' => $user,
         ]);
+    }
+
+    /**
+     * Foto makanan tetap di disk privat — tidak ada URL publik ke sana
+     * (aturan yang sama dengan Api\V1\FotoController). Di web, penjaganya
+     * adalah sesi login + middleware 'admin' pada grup rutenya.
+     */
+    public function foto(User $user, Sesi $sesi)
+    {
+        $this->pastikanSesiMilikResponden($user, $sesi);
+
+        if (! $sesi->foto_disk_path || ! Storage::disk('local')->exists($sesi->foto_disk_path)) {
+            abort(404);
+        }
+
+        return Storage::disk('local')->response($sesi->foto_disk_path);
+    }
+
+    private function pastikanSesiMilikResponden(User $user, Sesi $sesi): void
+    {
+        abort_if($user->isAdmin(), 404);
+
+        if ($sesi->user_id !== $user->id) {
+            abort(404);
+        }
     }
 }

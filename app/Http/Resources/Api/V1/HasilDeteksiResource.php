@@ -26,6 +26,10 @@ class HasilDeteksiResource extends JsonResource
                 'gula_total' => $this->total_gula_total,
                 'serat' => $this->total_serat,
             ],
+            // Zat yang totalnya diketahui tidak lengkap — ada makanan pada
+            // sesi ini yang tidak menyumbang angka untuk zat itu. Selalu ada,
+            // boleh kosong. Angka pada total tetap dikirim apa adanya.
+            'zat_tidak_lengkap' => $this->zat_tidak_lengkap ?? [],
             'makanan' => ItemMakananResource::collection($this->itemMakanan),
         ];
     }

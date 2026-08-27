@@ -67,7 +67,12 @@
         </div>
         @forelse($sesiList as $sesi)
           <div class="d-flex align-items-center gap-3 py-2" style="border-bottom:1px solid #F3F9F6">
-            <i class="bi bi-camera-fill" style="color:var(--hw-green-400)"></i>
+            @if($sesi->foto_disk_path)
+              <img src="{{ route('admin.users.session.foto', [$user, $sesi]) }}" alt="Foto makanan"
+                   width="38" height="38" class="rounded-3" style="object-fit:cover;background:var(--hw-tint)">
+            @else
+              <i class="bi bi-camera-fill" style="color:var(--hw-green-400)"></i>
+            @endif
             <div class="flex-grow-1">
               <div class="fw-bold" style="font-size:.84rem">{{ $sesi->waktu_foto->translatedFormat('d M Y, H:i') }}</div>
               <div class="hw-sub">{{ ucfirst(str_replace('_', ' ', $sesi->status)) }}</div>
