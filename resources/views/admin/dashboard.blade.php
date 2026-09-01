@@ -7,7 +7,7 @@
 @section('content')
 
   <div class="row g-3">
-    <div class="col-12 col-sm-6 col-xxl-3">
+    <div class="col-12 col-sm-6 col-xxl-4">
       <div class="hw-card hw-card-pad h-100">
         <div class="d-flex align-items-center justify-content-between mb-3">
           <div class="hw-icon-box" style="background:var(--hw-tint);color:var(--hw-green-600)"><i class="bi bi-people-fill"></i></div>
@@ -19,7 +19,7 @@
         </div>
       </div>
     </div>
-    <div class="col-12 col-sm-6 col-xxl-3">
+    <div class="col-12 col-sm-6 col-xxl-4">
       <div class="hw-card hw-card-pad h-100">
         <div class="d-flex align-items-center justify-content-between mb-3">
           <div class="hw-icon-box" style="background:#EAF7F0;color:var(--hw-green-600)"><i class="bi bi-clock-history"></i></div>
@@ -32,7 +32,7 @@
         <div class="hw-sub mt-1">{{ $sesiSelesai }} sesi selesai</div>
       </div>
     </div>
-    <div class="col-12 col-sm-6 col-xxl-3">
+    <div class="col-12 col-sm-6 col-xxl-4">
       <div class="hw-card hw-card-pad h-100">
         <div class="d-flex align-items-center justify-content-between mb-3">
           <div class="hw-icon-box" style="background:#E9F4FB;color:#1B7FA8"><i class="bi bi-droplet-fill"></i></div>
@@ -41,18 +41,6 @@
         <div class="d-flex align-items-baseline gap-1 mt-1">
           <div class="hw-kpi-value">{{ $rataRataGula ?: '—' }}</div>
           <div class="fw-semibold" style="font-size:.82rem;color:var(--hw-muted)">mg/dL</div>
-        </div>
-      </div>
-    </div>
-    <div class="col-12 col-sm-6 col-xxl-3">
-      <div class="hw-card hw-card-pad h-100">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-          <div class="hw-icon-box" style="background:var(--hw-ink);color:var(--hw-mint)"><i class="bi bi-smartwatch"></i></div>
-        </div>
-        <div class="fw-semibold" style="font-size:.82rem;color:var(--hw-muted)">Perangkat Terdaftar</div>
-        <div class="d-flex align-items-baseline gap-1 mt-1">
-          <div class="hw-kpi-value">{{ $perangkatTerdaftar }}</div>
-          <div class="fw-semibold" style="font-size:.82rem;color:var(--hw-muted)">watch</div>
         </div>
       </div>
     </div>

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Perangkat;
 use App\Models\Sampel;
 use App\Models\Sesi;
 use App\Models\User;
@@ -70,7 +69,6 @@ class DashboardController extends Controller
             'sesiSelesai' => $sesiQuery()->where('status', 'selesai')->count(),
             'rataRataGula' => $rataRataGula,
             'sampelPerluPerhatian' => $sampelPerluPerhatian,
-            'perangkatTerdaftar' => Perangkat::whereIn('user_id', $respondenIds)->count(),
             'respondenTeraktif' => $respondenTeraktif,
         ]);
     }

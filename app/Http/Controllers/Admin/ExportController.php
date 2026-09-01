@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Perangkat;
 use App\Models\Sampel;
 use App\Models\Sesi;
 use App\Models\User;
@@ -42,7 +41,6 @@ class ExportController extends Controller
             'totalTitikData' => Sampel::whereHas('sesi', fn ($q) => $q->whereIn('user_id', $ids))
                 ->where('status', 'terisi')
                 ->count(),
-            'totalPerangkat' => Perangkat::whereIn('user_id', $ids)->count(),
         ]);
     }
 

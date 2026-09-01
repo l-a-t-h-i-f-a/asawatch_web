@@ -39,7 +39,7 @@ class UserController extends Controller
     {
         abort_if($user->isAdmin(), 404);
 
-        $user->load(['profil', 'perangkat' => fn ($query) => $query->latest('terakhir_tersambung')])
+        $user->load('profil')
             ->loadCount(['sesi', 'sesi as sesi_selesai_count' => fn ($q) => $q->where('status', 'selesai')]);
 
         // Hanya sesi yang benar-benar ditampilkan yang dimuat — sebelumnya

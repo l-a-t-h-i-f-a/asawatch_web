@@ -2,11 +2,10 @@
 
 @section('title', 'Detail Responden — AsaWatch')
 @section('page-title', 'Detail Responden')
-@section('page-subtitle', 'Ringkasan profil, perangkat, dan data kesehatan terbaru responden')
+@section('page-subtitle', 'Ringkasan profil dan data kesehatan terbaru responden')
 
 @php
   $profil = $user->profil;
-  $perangkat = $user->perangkat->first();
   $inisial = \Illuminate\Support\Str::of($user->nama)->explode(' ')->filter()->map(fn ($kata) => mb_substr($kata, 0, 1))->take(2)->implode('');
   $usia = $profil?->tanggal_lahir ? $profil->tanggal_lahir->age . ' tahun' : 'Belum diisi';
   $sampel = $sampelTerbaru;
@@ -23,7 +22,7 @@
   </div>
 
   <div class="row g-3">
-    <div class="col-12 col-xl-8">
+    <div class="col-12">
       <div class="hw-card hw-card-pad h-100 d-flex gap-3 align-items-center flex-wrap">
         <div class="hw-avatar" style="width:82px;height:82px;flex:0 0 82px;border-radius:24px;font-size:1.6rem">{{ $inisial ?: '?' }}</div>
         <div class="flex-grow-1">
@@ -36,16 +35,6 @@
             <div><div class="hw-stat-label">Bergabung</div><div class="fw-bold mt-1" style="font-size:.9rem">{{ $user->created_at->translatedFormat('d M Y') }}</div></div>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="col-12 col-xl-4">
-      <div class="hw-card hw-card-pad h-100 d-flex flex-column gap-2" style="background:linear-gradient(160deg,#E9F8F0,#D6F0E3);border-color:#CFEBDD">
-        <div class="d-flex align-items-center gap-2">
-          <div class="hw-icon-box" style="width:44px;height:44px;border-radius:13px;background:var(--hw-ink);color:var(--hw-mint)"><i class="bi bi-smartwatch"></i></div>
-          <div class="flex-grow-1"><div class="fw-bold" style="font-size:.9rem">{{ $perangkat ? 'Perangkat terhubung' : 'Belum ada perangkat' }}</div><div style="font-size:.78rem;color:#4A6A5C">{{ $perangkat?->nama ?? 'Hubungkan AsaWatch dari aplikasi' }}</div></div>
-          @if($perangkat?->baterai_terakhir !== null)<div class="fw-bold text-ok" style="font-size:.82rem">{{ $perangkat->baterai_terakhir }}%</div>@endif
-        </div>
-        <div style="font-size:.78rem;color:#4A6A5C">{{ $perangkat?->terakhir_tersambung ? 'Terakhir tersambung ' . $perangkat->terakhir_tersambung->translatedFormat('d M Y, H:i') : 'Belum ada sinkronisasi perangkat.' }}</div>
       </div>
     </div>
   </div>

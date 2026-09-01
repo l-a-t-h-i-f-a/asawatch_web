@@ -53,13 +53,9 @@
           <span style="font-size:.84rem;color:var(--hw-ink-2)">Di antaranya sesi uji</span>
           <span class="fw-bold" style="font-size:.84rem">{{ $totalSesiUji }}</span>
         </div>
-        <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid #F3F9F6">
+        <div class="d-flex justify-content-between py-2">
           <span style="font-size:.84rem;color:var(--hw-ink-2)">Titik pengukuran terisi</span>
           <span class="fw-bold" style="font-size:.84rem">{{ $totalTitikData }}</span>
-        </div>
-        <div class="d-flex justify-content-between py-2">
-          <span style="font-size:.84rem;color:var(--hw-ink-2)">Perangkat terdaftar</span>
-          <span class="fw-bold" style="font-size:.84rem">{{ $totalPerangkat }}</span>
         </div>
       </div>
     </div>
