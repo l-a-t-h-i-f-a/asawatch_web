@@ -64,14 +64,6 @@
           </div>
         </div>
 
-        <div class="d-flex align-items-center justify-content-between">
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="remember" id="remember">
-            <label class="form-check-label fw-semibold" for="remember" style="font-size:.84rem;color:var(--hw-ink-2)">Ingat perangkat ini</label>
-          </div>
-          <a href="#lupa" class="fw-semibold" style="font-size:.84rem">Lupa sandi?</a>
-        </div>
-
         <button class="btn btn-hw d-flex align-items-center justify-content-center gap-2" type="submit" style="padding:.9rem;font-size:.95rem;box-shadow:0 8px 18px rgba(18,133,90,.24)">
           Masuk <i class="bi bi-arrow-right"></i>
         </button>
@@ -79,7 +71,7 @@
 
       <div class="hw-card p-3 d-flex gap-2">
         <i class="bi bi-info-circle" style="color:var(--hw-green-400)"></i>
-        <div style="font-size:.78rem;line-height:1.55;color:#5D7A6D">Belum punya akun? Daftar lewat aplikasi mobile AsaWatch terlebih dahulu, lalu masuk di sini dengan email &amp; kata sandi yang sama.</div>
+        <div style="font-size:.78rem;line-height:1.55;color:#5D7A6D">Portal ini hanya untuk akun administrator dan tidak melayani pendaftaran. Responden memakai aplikasi mobile AsaWatch, bukan halaman ini.</div>
       </div>
     </form>
   </div>
