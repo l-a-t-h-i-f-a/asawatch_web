@@ -32,7 +32,7 @@
             <div><div class="hw-stat-label">Usia</div><div class="fw-bold mt-1" style="font-size:.9rem">{{ $usia }}</div></div>
             <div><div class="hw-stat-label">Jenis kelamin</div><div class="fw-bold mt-1" style="font-size:.9rem">{{ $profil?->jenis_kelamin ? ucfirst($profil->jenis_kelamin) : 'Belum diisi' }}</div></div>
             <div><div class="hw-stat-label">Golongan darah</div><div class="fw-bold mt-1" style="font-size:.9rem">{{ $profil?->golongan_darah ?? '—' }}</div></div>
-            <div><div class="hw-stat-label">Bergabung</div><div class="fw-bold mt-1" style="font-size:.9rem">{{ $user->created_at->translatedFormat('d M Y') }}</div></div>
+            <div><div class="hw-stat-label">Bergabung</div><div class="fw-bold mt-1" style="font-size:.9rem">{{ \App\Support\Waktu::tanggal($user->created_at) }}</div></div>
           </div>
         </div>
       </div>
@@ -47,7 +47,7 @@
   </div>
 
   <div class="row g-3">
-    <div class="col-12 col-xl-7"><div class="hw-card hw-card-pad h-100"><div class="hw-title mb-3">Profil Kesehatan</div><div class="row g-3"><div class="col-6"><div class="hw-stat-label">Tinggi badan</div><div class="fw-bold mt-1">{{ $profil?->tinggi_cm ? $profil->tinggi_cm . ' cm' : 'Belum diisi' }}</div></div><div class="col-6"><div class="hw-stat-label">Berat badan</div><div class="fw-bold mt-1">{{ $profil?->berat_kg ? $profil->berat_kg . ' kg' : 'Belum diisi' }}</div></div><div class="col-6"><div class="hw-stat-label">SpO₂ terakhir</div><div class="fw-bold mt-1">{{ $sampel?->spo2 ? $sampel->spo2 . '%' : 'Belum ada data' }}</div></div><div class="col-6"><div class="hw-stat-label">Sampel terakhir</div><div class="fw-bold mt-1">{{ $sampel?->created_at?->translatedFormat('d M Y, H:i') ?? 'Belum ada data' }}</div></div></div></div></div>
+    <div class="col-12 col-xl-7"><div class="hw-card hw-card-pad h-100"><div class="hw-title mb-3">Profil Kesehatan</div><div class="row g-3"><div class="col-6"><div class="hw-stat-label">Tinggi badan</div><div class="fw-bold mt-1">{{ $profil?->tinggi_cm ? $profil->tinggi_cm . ' cm' : 'Belum diisi' }}</div></div><div class="col-6"><div class="hw-stat-label">Berat badan</div><div class="fw-bold mt-1">{{ $profil?->berat_kg ? $profil->berat_kg . ' kg' : 'Belum diisi' }}</div></div><div class="col-6"><div class="hw-stat-label">SpO₂ terakhir</div><div class="fw-bold mt-1">{{ $sampel?->spo2 ? $sampel->spo2 . '%' : 'Belum ada data' }}</div></div><div class="col-6"><div class="hw-stat-label">Sampel terakhir</div><div class="fw-bold mt-1">{{ \App\Support\Waktu::tanggalJam($sampel?->created_at) ?? 'Belum ada data' }}</div></div></div></div></div>
     <div class="col-12 col-xl-5">
       <div class="hw-card hw-card-pad h-100">
         <div class="d-flex align-items-center justify-content-between mb-3">
@@ -63,7 +63,7 @@
               <i class="bi bi-camera-fill" style="color:var(--hw-green-400)"></i>
             @endif
             <div class="flex-grow-1">
-              <div class="fw-bold" style="font-size:.84rem">{{ $sesi->waktu_foto->translatedFormat('d M Y, H:i') }}</div>
+              <div class="fw-bold" style="font-size:.84rem">{{ \App\Support\Waktu::tanggalJam($sesi->waktu_foto) }}</div>
               <div class="hw-sub">{{ ucfirst(str_replace('_', ' ', $sesi->status)) }}</div>
             </div>
             <a class="btn btn-hw-outline btn-sm" href="{{ route('admin.users.session.show', [$user, $sesi]) }}">Lihat</a>

@@ -60,7 +60,7 @@
                 </div>
               </td>
               <td style="font-size:.84rem;color:var(--hw-ink-2)">
-                {{ $user->created_at->translatedFormat('d M Y') }}
+                {{ \App\Support\Waktu::tanggal($user->created_at) }}
               </td>
               <td class="text-end">
                 <a class="btn btn-hw-outline btn-sm" href="{{ route('admin.users.show', $user) }}">Lihat Detail</a>

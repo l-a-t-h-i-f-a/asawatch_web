@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Sampel;
 use App\Models\Sesi;
 use App\Models\User;
+use App\Support\Waktu;
 use Illuminate\Http\Request;
 
 /**
@@ -24,10 +25,11 @@ class DashboardController extends Controller
 
         // "Hari ini" mengacu ke waktu foto sesi, bukan sampel.created_at —
         // created_at adalah waktu baris tersinkron dari ponsel, yang bisa
-        // terjadi berhari-hari setelah pengukurannya.
+        // terjadi berhari-hari setelah pengukurannya. Batas harinya WIB
+        // (lihat Waktu::rentangHariIni), bukan UTC seperti today().
         $rataRataGula = (int) round(
             $sampelTerisi()
-                ->whereHas('sesi', fn ($q) => $q->whereDate('waktu_foto', today()))
+                ->whereHas('sesi', fn ($q) => $q->whereBetween('waktu_foto', Waktu::rentangHariIni()))
                 ->avg('gula_darah') ?? 0
         );
 

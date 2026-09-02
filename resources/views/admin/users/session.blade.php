@@ -46,7 +46,7 @@
     <div class="hw-icon-box" style="width:64px;height:64px;border-radius:20px;font-size:1.4rem;background:var(--hw-tint);color:var(--hw-green-600)"><i class="bi bi-camera-fill"></i></div>
     <div class="flex-grow-1">
       <div class="d-flex align-items-center gap-2 flex-wrap">
-        <div style="font-size:1.3rem;font-weight:800;letter-spacing:-.4px">{{ $sesi->waktu_foto->translatedFormat('d M Y, H:i') }}</div>
+        <div style="font-size:1.3rem;font-weight:800;letter-spacing:-.4px">{{ \App\Support\Waktu::tanggalJam($sesi->waktu_foto) }}</div>
         <span class="hw-pill hw-pill-info">{{ $statusLabel($sesi->status) }}</span>
         @if ($sesi->waktu_tidak_pasti)
           <span class="hw-pill hw-pill-warn">Waktu tidak pasti</span>
@@ -54,7 +54,7 @@
       </div>
       <div class="hw-sub">Responden: {{ $selectedUser->nama }} · {{ $selectedUser->email }}</div>
       <div class="hw-sub">ID sesi: {{ $sesi->id }}</div>
-      <div class="hw-sub">t0: {{ $sesi->t0?->translatedFormat('d M Y, H:i') ?? 'Belum ditekan di jam' }}</div>
+      <div class="hw-sub">t0: {{ \App\Support\Waktu::tanggalJam($sesi->t0) ?? 'Belum ditekan di jam' }}</div>
     </div>
   </div>
 
@@ -91,7 +91,7 @@
         @if ($fotoUrl)
           {{-- Foto ada di disk privat; tautan ini pun hanya bisa dibuka admin yang sedang login. --}}
           <a href="{{ $fotoUrl }}" target="_blank" rel="noopener" title="Buka foto ukuran penuh">
-            <img src="{{ $fotoUrl }}" alt="Foto makanan sesi {{ $sesi->waktu_foto->translatedFormat('d M Y, H:i') }}"
+            <img src="{{ $fotoUrl }}" alt="Foto makanan sesi {{ \App\Support\Waktu::tanggalJam($sesi->waktu_foto) }}"
                  class="w-100 rounded-4" style="max-height:320px;object-fit:cover;background:var(--hw-tint)">
           </a>
           <div class="hw-sub mt-2">Foto yang dianalisis · klik untuk ukuran penuh</div>

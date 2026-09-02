@@ -7,6 +7,7 @@ use App\Models\Sampel;
 use App\Models\Sesi;
 use App\Models\User;
 use App\Support\LingkupResponden;
+use App\Support\Waktu;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -47,7 +48,9 @@ class ExportController extends Controller
     public function downloadJson(Request $request): StreamedResponse
     {
         $lingkup = LingkupResponden::dari($request);
-        $nama = "asawatch_{$lingkup->slug()}_".now()->format('Y-m-d').'.json';
+        // Tanggal berkas mengikuti hari WIB; isi berkas tetap UTC (kembar
+        // dari GET /api/v1/akun/ekspor).
+        $nama = "asawatch_{$lingkup->slug()}_".Waktu::tanggal(now(), 'Y-m-d').'.json';
 
         return response()->streamDownload(function () use ($lingkup) {
             $out = fopen('php://output', 'w');
@@ -83,7 +86,7 @@ class ExportController extends Controller
     public function downloadCsv(Request $request): StreamedResponse
     {
         $lingkup = LingkupResponden::dari($request);
-        $nama = "asawatch_sampel_{$lingkup->slug()}_".now()->format('Y-m-d').'.csv';
+        $nama = "asawatch_sampel_{$lingkup->slug()}_".Waktu::tanggal(now(), 'Y-m-d').'.csv';
 
         return response()->streamDownload(function () use ($lingkup) {
             $out = fopen('php://output', 'w');

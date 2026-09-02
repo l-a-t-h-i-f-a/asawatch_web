@@ -2,7 +2,7 @@
 
 @section('title', 'Dashboard · AsaWatch')
 @section('page-title', 'Dashboard')
-@section('page-subtitle', 'Ringkasan seluruh responden AsaWatch · diperbarui ' . now()->format('H:i'))
+@section('page-subtitle', 'Ringkasan seluruh responden AsaWatch · diperbarui ' . \App\Support\Waktu::jam(now()))
 
 @section('content')
 
@@ -90,7 +90,7 @@
           @forelse ($sampelPerluPerhatian as $s)
             <tr>
               <td class="fw-bold" style="font-size:.84rem">{{ $s->sesi->user->nama ?? '—' }}</td>
-              <td style="font-size:.84rem;color:var(--hw-ink-2)">{{ $s->sesi->waktu_foto->translatedFormat('d M Y, H:i') }}</td>
+              <td style="font-size:.84rem;color:var(--hw-ink-2)">{{ \App\Support\Waktu::tanggalJam($s->sesi->waktu_foto) }}</td>
               <td style="font-size:.84rem;color:var(--hw-ink-2)">Titik {{ $s->index + 1 }}</td>
               <td class="fw-bold" style="font-size:.84rem">{{ $s->gula_darah ?? '—' }} <span class="fw-normal" style="color:var(--hw-muted-2);font-size:.75rem">mg/dL</span></td>
               <td class="fw-bold" style="font-size:.84rem">{{ $s->sistolik && $s->diastolik ? "{$s->sistolik}/{$s->diastolik}" : '—' }}</td>
