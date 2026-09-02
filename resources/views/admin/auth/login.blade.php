@@ -9,13 +9,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('admin/assets/css/asawatch.css') }}">
+<link rel="icon" type="image/png" href="{{ asset('admin/assets/logo-mark.png') }}">
 </head>
 <body>
 <div class="hw-login">
   <div class="hw-login-aside">
     <div class="blob blob-1"></div><div class="blob blob-2"></div>
     <div class="hw-brand position-relative p-0">
-      <div class="hw-brand-mark" style="background:rgba(255,255,255,.15);box-shadow:none"><i class="bi bi-heart-pulse-fill"></i></div>
+      <div class="hw-brand-mark is-logo" style="box-shadow:none"><img src="{{ asset('admin/assets/logo-mark.png') }}" alt="Logo AsaWatch"></div>
       <div>
         <div class="hw-brand-name text-white">Asa<span style="color:var(--hw-mint)">Watch</span></div>
         <div class="hw-brand-sub" style="color:rgba(234,247,240,.7)">Panel Administrator</div>

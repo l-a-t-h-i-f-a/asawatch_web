@@ -38,6 +38,8 @@ body{-webkit-font-smoothing:antialiased}
 .hw-brand-name{font-size:1.06rem;font-weight:800;letter-spacing:-.3px;line-height:1.1}
 .hw-brand-name span{color:var(--hw-green-400)}
 .hw-brand-sub{font-size:.69rem;font-weight:600;color:var(--hw-muted);letter-spacing:.4px;text-transform:uppercase}
+.hw-brand-mark img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
+.hw-brand-mark.is-logo{background:none;padding:0;overflow:hidden}
 
 /* Nav */
 .hw-navlabel{font-size:.69rem;font-weight:700;color:var(--hw-muted-2);letter-spacing:1px;padding:0 .6rem .5rem}

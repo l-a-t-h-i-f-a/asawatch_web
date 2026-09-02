@@ -1,5 +1,5 @@
 <div class="hw-brand">
-  <div class="hw-brand-mark"><i class="bi bi-heart-pulse-fill"></i></div>
+  <div class="hw-brand-mark is-logo"><img src="{{ asset('admin/assets/logo-mark.png') }}" alt="Logo AsaWatch"></div>
   <div>
     <div class="hw-brand-name">Asa<span>Watch</span></div>
     <div class="hw-brand-sub">Panel Administrator</div>
