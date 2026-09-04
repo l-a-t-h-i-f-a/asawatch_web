@@ -21,20 +21,19 @@
   // dicetak sebagai kosong, apalagi sebagai nol.
   $angka = fn ($nilai, $satuan = '') => $nilai === null ? '—' : $nilai . $satuan;
   $tidakLengkap = $sesi->hasilDeteksi?->zat_tidak_lengkap ?? [];
-  // Padanan longgar sengaja ditandai berbeda: angkanya sah dipakai, tapi saat
-  // analisis nanti harus bisa dipisahkan dari yang cocok persis.
-  $labelCocok = [
-      'tepat' => ['Cocok persis', 'hw-pill-ok'],
-      'alias' => ['Lewat alias', 'hw-pill-ok'],
-      'generik' => ['Padanan generik', 'hw-pill-warn'],
-      // Dicocokkan otomatis oleh LLM saat permintaan berjalan, belum pernah
-      // diperiksa siapa pun. Angkanya sah dipakai, tapi inilah baris yang
-      // perlu disisir sebelum datanya dianggap final.
-      'alias_llm' => ['Otomatis, belum diperiksa', 'hw-pill-bad'],
-  ];
   $labelZat = [
       'kalori' => 'kalori', 'karbohidrat' => 'karbohidrat', 'protein' => 'protein',
       'lemak' => 'lemak', 'gula_total' => 'gula', 'serat' => 'serat',
+  ];
+  // Keenam zat yang disimpan hasil_deteksi/item_makanan. Urutannya sama di
+  // ringkasan sesi dan di kartu per makanan supaya gampang dibandingkan.
+  $zatGizi = [
+      ['kunci' => 'kalori', 'judul' => 'Kalori', 'satuan' => ' kcal'],
+      ['kunci' => 'karbohidrat', 'judul' => 'Karbohidrat', 'satuan' => ' g'],
+      ['kunci' => 'protein', 'judul' => 'Protein', 'satuan' => ' g'],
+      ['kunci' => 'lemak', 'judul' => 'Lemak', 'satuan' => ' g'],
+      ['kunci' => 'gula_total', 'judul' => 'Gula', 'satuan' => ' g'],
+      ['kunci' => 'serat', 'judul' => 'Serat', 'satuan' => ' g'],
   ];
 @endphp
 
@@ -106,28 +105,19 @@
       <div class="col-12 col-lg-8">
     @if ($sesi->hasilDeteksi)
       <div class="d-flex flex-wrap gap-4 mb-3">
-        <div>
-          <div class="fw-bold" style="font-size:.7rem;color:var(--hw-muted-2);text-transform:uppercase;letter-spacing:.5px">Indeks Glikemik</div>
-          <div class="fw-bold mt-1" style="font-size:.9rem">{{ $sesi->hasilDeteksi->indeks_glikemik_perkiraan ? ucfirst($sesi->hasilDeteksi->indeks_glikemik_perkiraan) : 'Belum tersedia' }}</div>
-        </div>
-        <div>
-          <div class="fw-bold" style="font-size:.7rem;color:var(--hw-muted-2);text-transform:uppercase;letter-spacing:.5px">Keyakinan</div>
-          <div class="fw-bold mt-1" style="font-size:.9rem">{{ $sesi->hasilDeteksi->keyakinan !== null ? round($sesi->hasilDeteksi->keyakinan * 100) . '%' : '—' }}</div>
-        </div>
-        <div>
-          <div class="fw-bold" style="font-size:.7rem;color:var(--hw-muted-2);text-transform:uppercase;letter-spacing:.5px">Dikoreksi Pengguna</div>
-          <div class="fw-bold mt-1" style="font-size:.9rem">{{ $sesi->hasilDeteksi->dikoreksi_user ? 'Ya' : 'Belum' }}</div>
-        </div>
-        <div>
-          <div class="fw-bold" style="font-size:.7rem;color:var(--hw-muted-2);text-transform:uppercase;letter-spacing:.5px">Total Kalori</div>
-          <div class="fw-bold mt-1" style="font-size:.9rem">@if (! $sesi->hasilDeteksi->total_kalori)
-              {{-- Nol di sini bukan "tanpa kalori": tidak ada satu pun makanan
-                   yang namanya ketemu di tabel gizi. --}}
-              Belum ada angka
-            @else
-              {{ in_array('kalori', $tidakLengkap) ? '≥ ' : '' }}{{ $sesi->hasilDeteksi->total_kalori }} kcal
-            @endif</div>
-        </div>
+        @foreach ($zatGizi as $zat)
+          @php $total = $sesi->hasilDeteksi->{'total_' . $zat['kunci']}; @endphp
+          <div>
+            <div class="fw-bold" style="font-size:.7rem;color:var(--hw-muted-2);text-transform:uppercase;letter-spacing:.5px">{{ $zat['judul'] }}</div>
+            <div class="fw-bold mt-1" style="font-size:.9rem">@if (! $total)
+                {{-- Nol di sini bukan "tanpa kalori": tidak ada satu pun makanan
+                     yang namanya ketemu di tabel gizi. --}}
+                Belum ada angka
+              @else
+                {{ in_array($zat['kunci'], $tidakLengkap) ? '≥ ' : '' }}{{ $total }}{{ $zat['satuan'] }}
+              @endif</div>
+          </div>
+        @endforeach
       </div>
       @if ($tidakLengkap)
         {{-- Totalnya jumlah parsial: ada makanan yang tidak menyumbang angka
@@ -144,19 +134,18 @@
             <div class="border rounded-4 p-3 h-100" style="border-color:#EDF6F1!important">
               <div class="fw-bold" style="font-size:.84rem">{{ $item->nama }}</div>
               <div style="font-size:.78rem;color:var(--hw-muted)" class="mt-2">{{ $item->porsi }} · {{ $angka($item->estimasi_gram, ' g') }}</div>
-              @if ($item->sumber_gizi)
-                <div class="mt-2 d-flex align-items-center gap-2 flex-wrap" style="font-size:.72rem;color:var(--hw-muted-2)">
-                  <span>Gizi dari <strong>{{ $item->sumber_gizi }}</strong></span>
-                  @if ($label = $labelCocok[$item->cocok] ?? null)
-                    <span class="hw-pill {{ $label[1] }}" style="font-size:.62rem">{{ $label[0] }}</span>
-                  @endif
-                </div>
-              @endif
               @if ($item->kalori === null)
                 {{-- Nama makanan tidak ketemu di TKPI, jadi tidak ada angkanya sama sekali. --}}
                 <div style="font-size:.78rem;color:var(--hw-muted-2)" class="mt-1">Gizi tidak ada di tabel TKPI</div>
               @else
-                <div style="font-size:.78rem;color:var(--hw-muted)" class="mt-1">{{ $angka($item->kalori, ' kcal') }} · gula {{ $angka($item->gula_total, ' g') }}</div>
+                <div class="row g-2 mt-1">
+                  @foreach ($zatGizi as $zat)
+                    <div class="col-4">
+                      <div style="font-size:.66rem;color:var(--hw-muted-2);text-transform:uppercase;letter-spacing:.4px">{{ $zat['judul'] }}</div>
+                      <div class="fw-semibold" style="font-size:.78rem;color:var(--hw-muted)">{{ $angka($item->{$zat['kunci']}, $zat['satuan']) }}</div>
+                    </div>
+                  @endforeach
+                </div>
               @endif
             </div>
           </div>

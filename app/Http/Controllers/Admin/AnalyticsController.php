@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\ItemMakanan;
+use App\Models\HasilDeteksi;
 use App\Models\Sampel;
 use App\Models\Sesi;
 use App\Support\LingkupResponden;
@@ -64,12 +64,37 @@ class AnalyticsController extends Controller
             ];
         });
 
-        $makananTinggiGula = ItemMakanan::whereHas('sesi', fn ($q) => $q->whereIn('user_id', $ids))
-            ->where('gula_total', '>=', 15)
-            ->orderByDesc('gula_total')
-            ->with('sesi.user:id,nama')
-            ->take(5)
-            ->get();
+        // Rata-rata asupan per sesi makan, bukan per potong makanan — yang
+        // dibandingkan antar responden adalah sekali makan.
+        //
+        // total_kalori = 0 disaring keluar: nol di hasil_deteksi berarti tidak
+        // satu pun nama makanan ketemu di TKPI, bukan makanan tanpa kalori.
+        // Kalau ikut dirata-rata, sesi gagal-cocok menarik semua angka ke bawah.
+        $sesiTeranalisis = fn () => HasilDeteksi::whereHas('sesi', fn ($q) => $q->whereIn('user_id', $ids))
+            ->where('total_kalori', '>', 0);
+
+        $rataGizi = $sesiTeranalisis()
+            ->selectRaw('COUNT(*) as n')
+            ->selectRaw('AVG(total_kalori) as kalori')
+            ->selectRaw('AVG(total_karbohidrat) as karbohidrat')
+            ->selectRaw('AVG(total_protein) as protein')
+            ->selectRaw('AVG(total_lemak) as lemak')
+            ->selectRaw('AVG(total_gula_total) as gula_total')
+            ->selectRaw('AVG(total_serat) as serat')
+            ->first();
+
+        // zat_tidak_lengkap disimpan sebagai array JSON, jadi tidak bisa
+        // dihitung di SQL. Dipakai untuk memberi tahu zat mana yang totalnya
+        // sering parsial — rata-ratanya cenderung lebih rendah dari kenyataan.
+        $sesiParsial = $sesiTeranalisis()->pluck('zat_tidak_lengkap')
+            ->filter()
+            ->values();
+
+        $zatSeringParsial = $sesiParsial
+            ->flatten()
+            ->countBy()
+            ->sortDesc()
+            ->keys();
 
         return view('admin.analitik', [
             'active' => 'analitik',
@@ -84,7 +109,10 @@ class AnalyticsController extends Controller
             'titikGulaTinggi' => $sampelTerisi()->where('gula_darah', '>=', 180)->count(),
             'kurvaPerIndex' => $kurvaPerIndex,
             'skalaGulaMaks' => self::SKALA_GULA_MAKS,
-            'makananTinggiGula' => $makananTinggiGula,
+            'rataGizi' => $rataGizi,
+            'sesiGiziDihitung' => (int) ($rataGizi->n ?? 0),
+            'sesiGiziParsial' => $sesiParsial->count(),
+            'zatSeringParsial' => $zatSeringParsial,
         ]);
     }
 }

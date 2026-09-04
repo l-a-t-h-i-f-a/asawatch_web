@@ -73,27 +73,46 @@
     </div>
     <div class="col-12 col-xl-6">
       <div class="hw-card hw-card-pad h-100">
-        <div class="hw-title">Makanan Tinggi Gula Teratas</div>
-        <div class="hw-sub mb-3">Dari hasil analisis foto, gula ≥ 15 g per porsi</div>
-        <div class="table-responsive">
-          <table class="table hw-table">
-            <thead><tr><th>Makanan</th><th>Porsi</th>@if($lingkup->semua())<th>Responden</th>@endif<th>Gula (g)</th></tr></thead>
-            <tbody>
-              @forelse ($makananTinggiGula as $item)
-                <tr>
-                  <td style="font-size:.84rem">{{ $item->nama }}</td>
-                  <td style="font-size:.84rem;color:var(--hw-ink-2)">{{ $item->porsi ?? '—' }}</td>
-                  @if($lingkup->semua())
-                    <td style="font-size:.84rem;color:var(--hw-ink-2)">{{ $item->sesi?->user?->nama ?? '—' }}</td>
-                  @endif
-                  <td class="fw-bold text-bad" style="font-size:.84rem">{{ $item->gula_total }}</td>
-                </tr>
-              @empty
-                <tr><td colspan="{{ $lingkup->semua() ? 4 : 3 }}" class="text-center text-muted py-4">Belum ada catatan makanan tinggi gula.</td></tr>
-              @endforelse
-            </tbody>
-          </table>
-        </div>
+        <div class="hw-title">Rata-rata Asupan per Sesi Makan</div>
+        <div class="hw-sub mb-3">Dari {{ number_format($sesiGiziDihitung, 0, ',', '.') }} sesi yang hasil analisis fotonya sudah punya angka gizi</div>
+        @if ($sesiGiziDihitung === 0)
+          <div class="hw-note">Belum ada sesi dengan hasil analisis nutrisi untuk lingkup ini.</div>
+        @else
+          @php
+            $zatGizi = [
+                ['kunci' => 'kalori', 'judul' => 'Kalori', 'satuan' => 'kcal', 'desimal' => 0],
+                ['kunci' => 'karbohidrat', 'judul' => 'Karbohidrat', 'satuan' => 'g', 'desimal' => 1],
+                ['kunci' => 'protein', 'judul' => 'Protein', 'satuan' => 'g', 'desimal' => 1],
+                ['kunci' => 'lemak', 'judul' => 'Lemak', 'satuan' => 'g', 'desimal' => 1],
+                ['kunci' => 'gula_total', 'judul' => 'Gula', 'satuan' => 'g', 'desimal' => 1],
+                ['kunci' => 'serat', 'judul' => 'Serat', 'satuan' => 'g', 'desimal' => 1],
+            ];
+            $labelZat = [
+                'kalori' => 'kalori', 'karbohidrat' => 'karbohidrat', 'protein' => 'protein',
+                'lemak' => 'lemak', 'gula_total' => 'gula', 'serat' => 'serat',
+            ];
+          @endphp
+          <div class="row g-3">
+            @foreach ($zatGizi as $zat)
+              <div class="col-6 col-sm-4">
+                <div class="hw-stat-label">{{ $zat['judul'] }}</div>
+                <div class="d-flex align-items-baseline gap-1 mt-1">
+                  <div style="font-size:1.25rem;font-weight:800;letter-spacing:-.5px">{{ number_format($rataGizi->{$zat['kunci']} ?? 0, $zat['desimal'], ',', '.') }}</div>
+                  <div class="fw-semibold" style="font-size:.74rem;color:var(--hw-muted-2)">{{ $zat['satuan'] }}</div>
+                </div>
+              </div>
+            @endforeach
+          </div>
+          @if ($sesiGiziParsial > 0)
+            {{-- Totalnya jumlah parsial pada sebagian sesi, jadi rata-ratanya
+                 lebih rendah dari asupan sebenarnya. --}}
+            <div class="hw-note mt-3">
+              {{ number_format($sesiGiziParsial, 0, ',', '.') }} dari {{ number_format($sesiGiziDihitung, 0, ',', '.') }} sesi totalnya belum lengkap untuk
+              <strong>{{ $zatSeringParsial->map(fn ($z) => $labelZat[$z] ?? $z)->join(', ', ' dan ') }}</strong> —
+              rata-rata zat tersebut cenderung lebih rendah dari kenyataan.
+            </div>
+          @endif
+        @endif
       </div>
     </div>
   </div>
