@@ -17,6 +17,11 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     Route::prefix('auth')->name('auth.')->group(function () {
         Route::post('daftar', [AuthController::class, 'daftar'])->name('daftar');
         Route::post('masuk', [AuthController::class, 'masuk'])->name('masuk')->middleware('throttle:masuk');
+        // Di luar `auth:sanctum`: inilah yang menerbitkan token itu.
+        // Throttle-nya ikut `masuk` -- keduanya jalur masuk tanpa token,
+        // dan membiarkan yang satu longgar membuat batasan yang satunya
+        // tidak ada gunanya.
+        Route::post('google', [AuthController::class, 'google'])->name('google')->middleware('throttle:masuk');
         Route::post('lupa-sandi', [AuthController::class, 'lupaSandi'])->name('lupa-sandi')->middleware('throttle:lupa-sandi');
         Route::post('atur-ulang-sandi', [AuthController::class, 'aturUlangSandi'])->name('atur-ulang-sandi');
 
