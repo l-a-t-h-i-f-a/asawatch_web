@@ -450,7 +450,7 @@ Semua di bawah `/admin`, dengan `AuthController` berbasis session
 | `admin.responden.show` | Detail satu sesi: 4 sampel, hasil deteksi, item makanan |
 | `admin.responden.detail` | Ringkasan pengguna + 8 sesi terakhir + sampel terbaru |
 | `admin.analitik` | Agregat deskriptif: rata-rata per metrik, kurva rata-rata gula darah per index 0–3, 5 makanan dengan gula tertinggi (≥ 15 g) |
-| `admin.ekspor.*` | Unduh JSON penuh atau CSV sampel, keduanya `streamDownload` |
+| `admin.ekspor.*` | Unduh XLSX multi-lembar, CSV pengukuran, atau JSON penuh — ketiganya mengikuti saringan yang sama. `ekspor.unduh` adalah satu pintu yang memilih format dari parameter `format` |
 | `admin.users.index` | **Khusus admin.** Daftar seluruh akun lain (akun admin sendiri disaring keluar), dengan pencarian nama/email dan paginasi 10 |
 | `admin.users.show` | **Khusus admin.** Detail satu pengguna — memakai ulang view `responden/detail` |
 | `admin.users.session.show` | **Khusus admin.** Detail satu sesi milik pengguna itu — memakai ulang view `responden/show` |
@@ -477,6 +477,48 @@ Dua batasan desain yang perlu diketahui sebelum menambah fitur di sini:
 
 `ExportController` adalah kembaran web dari `GET /api/v1/akun/ekspor` — hak
 pengguna mengunduh datanya sendiri, bukan fitur pelaporan.
+
+**Saringan ekspor.** `App\Support\SaringanEkspor` menampung ketiga pilihan
+di halaman ekspor (lingkup responden, rentang tanggal, sertakan sesi uji) dan
+`App\Services\Ekspor\AliranResponden` memasangnya pada relasi yang dimuat.
+Sesi yang sudah di-soft-delete responden tidak pernah diekspor — laporan hanya
+memuat data yang masih diakui pemiliknya. Ketiga format memakai keduanya, jadi
+yang membedakan XLSX, CSV, dan JSON hanyalah cara menulis — tidak pernah
+baris mana yang ikut. `RingkasanEkspor` menghitung jumlah baris dengan
+saringan yang sama supaya angka di layar persis isi berkas yang turun.
+
+Bentuk berkas (`App\Services\Ekspor\FormatEkspor`) sengaja ikut jadi
+parameter saringan, bukan sekadar tujuan tombol: dengan begitu panel "Isi
+Berkas" bisa menyesuaikan diri di sisi server — rincian per lembar untuk XLSX,
+jumlah baris untuk CSV — dan halaman cukup punya satu tombol unduh yang
+menunjuk `ekspor.unduh`, tetap bekerja tanpa JavaScript. Ketiga rute langsung
+(`ekspor.xlsx`/`csv`/`json`) tetap ada sebagai alamat yang bisa ditandai.
+
+**Struktur berkas XLSX.** `App\Services\Ekspor\SkemaEkspor` adalah satu
+sumber kebenaran untuk baris header, lembar "Kamus Data", dan urutan nilai
+yang ditulis `PenyusunXlsx` — jumlah nilai yang tidak cocok dengan definisi
+lembar dilempar sebagai `LogicException`, bukan diam-diam menggeser kolom.
+
+Berkasnya dua lapis, karena pembacanya dua macam. Di depan: "Baca Ini Dulu"
+(konteks ekspor, urutan membaca, daftar lembar beserta gunanya, aturan isi
+sel) lalu "Ringkasan Sesi" — satu baris per sesi dengan judul kolom berbahasa
+manusia dan bersatuan, satu-satunya lembar yang sengaja tidak memakai
+snake_case. Di belakangnya lembar mentah per entitas (Responden, Sesi,
+Pengukuran, Pengukuran Lebar, Item Makanan) untuk SPSS/R, ditutup "Kamus
+Data". Kalibrasi dan perangkat sengaja **tidak** masuk XLSX/CSV — keduanya
+data operasional alat, bukan data pengamatan; arsip lengkapnya tetap ada di
+unduhan JSON. Kolom "ID sesi" pada lembar ramah-baca adalah
+jembatan ke `sesi_id` di lembar mentah. `SkemaEkspor::penjelasan()` memasok
+kalimat "lembar ini untuk apa" ke lembar panduan sekaligus panel isi berkas
+di halaman ekspor, supaya keduanya tidak pernah berbeda. Lembar "Pengukuran
+Lebar" membentangkan keempat slot sampel menyamping (`*_s0`–`*_s3`, dinomori
+mengikuti kolom `index` karena sesi uji boleh memampatkan jadwal) — bentuk
+yang dipakai uji berpasangan. Nilai kosong ditulis sebagai sel kosong (bukan
+0), boolean sebagai 1/0, waktu sebagai sepasang kolom `*_wib` (sel tanggal
+Excel) dan `*_utc` (teks ISO-8601). Berkas dirakit ke berkas sementara di
+`storage/app/private/ekspor` lalu dihapus setelah terkirim: xlsx adalah arsip
+ZIP sehingga tidak bisa dialirkan sepotong-sepotong seperti CSV, tapi
+OpenSpout tetap menulis per baris sehingga memorinya tetap.
 
 **Catatan tampilan:** UI yang hidup ada di `resources/views/admin/`
 (`layout.blade.php` + partial sidebar/header/offcanvas). Folder

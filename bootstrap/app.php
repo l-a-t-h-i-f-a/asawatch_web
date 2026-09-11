@@ -1,6 +1,7 @@
 <?php
 
 use App\Exceptions\ApiException;
+use App\Http\Middleware\EnsureAdmin;
 use App\Support\KodeGalat;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
@@ -23,7 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'admin' => \App\Http\Middleware\EnsureAdmin::class,
+            'admin' => EnsureAdmin::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -81,7 +82,7 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        $exceptions->render(function (\Throwable $e, Request $request) use ($galat, $isApi) {
+        $exceptions->render(function (Throwable $e, Request $request) use ($galat, $isApi) {
             if ($isApi($request) && ! app()->hasDebugModeEnabled()) {
                 return $galat(KodeGalat::GALAT_SERVER, 'Terjadi kesalahan pada server.', null, 500);
             }

@@ -16,12 +16,12 @@ use App\Jobs\HapusAkunJob;
 use App\Models\Profil;
 use App\Models\User;
 use App\Support\KodeGalat;
+use Google\Auth\AccessToken;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
-use Google\Auth\AccessToken;
 
 class AuthController extends Controller
 {

@@ -92,6 +92,9 @@ body{-webkit-font-smoothing:antialiased}
 .form-check-input:checked{background-color:var(--hw-green);border-color:var(--hw-green)}
 .btn-hw{background:var(--hw-green);color:#fff;border:0;border-radius:.8rem;font-weight:700;font-size:.9rem;padding:.65rem 1.05rem}
 .btn-hw:hover{background:var(--hw-green-600);color:#fff}
+/* .btn:disabled Bootstrap memakai variabel dan menang spesifisitas atas .btn-hw,
+   sehingga tombol nonaktif jadi transparan tanpa aturan ini. */
+.btn-hw:disabled,.btn-hw.disabled{background:var(--hw-green);color:#fff;opacity:.45}
 .btn-hw-soft{background:var(--hw-tint);color:var(--hw-green-600);border:0;border-radius:.7rem;font-weight:700;font-size:.85rem;padding:.6rem 1rem}
 .btn-hw-soft:hover{background:#DCF2E6;color:var(--hw-green-600)}
 .btn-hw-outline{background:#fff;color:var(--hw-ink-2);border:1px solid var(--hw-line-2);border-radius:.7rem;font-weight:600;font-size:.85rem;padding:.55rem .9rem;white-space:nowrap}
@@ -131,3 +134,25 @@ body{-webkit-font-smoothing:antialiased}
 .hw-grid line{stroke:#EDF6F1;stroke-width:1}
 .hw-axis text{fill:var(--hw-muted-2);font-size:11px}
 .hw-spark{width:100%;height:48px}
+
+/* Halaman ekspor */
+.hw-step{display:flex;align-items:center;gap:.6rem}
+.hw-step-no{width:26px;height:26px;border-radius:50%;background:var(--hw-green);color:#fff;
+  display:grid;place-items:center;font-size:.76rem;font-weight:800;flex:0 0 26px}
+.hw-chip{display:inline-flex;align-items:center;gap:.35rem;background:var(--hw-tint);color:var(--hw-green-600);
+  border-radius:20px;padding:.3rem .75rem;font-size:.76rem;font-weight:700}
+.hw-format{display:block;height:100%;cursor:pointer;background:#fff;border:1.5px solid var(--hw-line-2);
+  border-radius:1rem;padding:1rem;transition:border-color .15s,background .15s}
+.hw-format:hover{border-color:var(--hw-green-400);background:var(--hw-soft)}
+.btn-check:checked+.hw-format{border-color:var(--hw-green);background:var(--hw-tint)}
+.btn-check:focus-visible+.hw-format{box-shadow:0 0 0 .2rem rgba(18,133,90,.15)}
+.hw-format i{font-size:1.45rem;color:var(--hw-green-600)}
+.hw-stat{flex:1;text-align:center}
+.hw-stat b{display:block;font-size:1.5rem;font-weight:800;letter-spacing:-.5px;line-height:1.15}
+.hw-stat span{font-size:.68rem;color:var(--hw-muted);text-transform:uppercase;letter-spacing:.5px}
+.hw-lembar{display:flex;justify-content:space-between;align-items:baseline;gap:.75rem;padding:.45rem 0;font-size:.8rem}
+.hw-lembar+.hw-lembar{border-top:1px solid #F3F9F6}
+.hw-berkas{display:flex;align-items:center;gap:.7rem;background:var(--hw-soft);border:1px dashed var(--hw-line-2);
+  border-radius:.85rem;padding:.7rem .85rem;font-size:.78rem;word-break:break-all}
+.hw-berkas i{font-size:1.3rem;color:var(--hw-green-600);flex:0 0 auto}
+@media (min-width:1200px){.hw-sticky{position:sticky;top:1.25rem}}

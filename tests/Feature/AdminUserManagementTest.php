@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\Sesi;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -113,7 +113,7 @@ class AdminUserManagementTest extends TestCase
 
         $this->actingAs($admin)->get(route('admin.ekspor.index'))
             ->assertStatus(200)
-            ->assertSee('Responden tercakup')
+            ->assertSee('Isi Berkas')
             ->assertDontSee('Ekspor Data Saya');
     }
 

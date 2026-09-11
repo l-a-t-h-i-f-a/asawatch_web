@@ -3,66 +3,121 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Sampel;
-use App\Models\Sesi;
 use App\Models\User;
-use App\Support\LingkupResponden;
+use App\Services\Ekspor\AliranResponden;
+use App\Services\Ekspor\FormatEkspor;
+use App\Services\Ekspor\PenyusunXlsx;
+use App\Services\Ekspor\RingkasanEkspor;
+use App\Services\Ekspor\SkemaEkspor;
+use App\Support\SaringanEkspor;
 use App\Support\Waktu;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Throwable;
 
 /**
- * Ekspor data penelitian: seluruh responden, atau satu responden saja bila
- * dipilih lewat "?responden=". Akun administrator tidak pernah ikut karena
- * tidak memiliki data pengukuran.
+ * Ekspor data penelitian dalam tiga bentuk, semuanya mengikuti saringan yang
+ * sama (lihat App\Support\SaringanEkspor): lingkup responden, rentang
+ * tanggal, dan dua sakelar penyertaan.
  *
- * Kolom/field sesi_uji ikut diekspor sebagai penanda sesi pengujian (jadwal
+ * - XLSX  — berkas kerja: satu lembar per entitas, plus Kamus Data.
+ * - CSV   — satu baris per titik pengukuran, untuk SPSS/R/Python.
+ * - JSON  — arsip mentah lengkap, kembar dari GET /api/v1/akun/ekspor.
+ *
+ * Akun administrator tidak pernah ikut karena tidak memiliki data pengukuran.
+ *
+ * Kolom sesi_uji ikut diekspor sebagai penanda sesi pengujian (jadwal
  * dimampatkan atau perangkat palsu). Penanda saja — tidak ada satu pun angka
  * di panel yang menyaring berdasarkan kolom ini.
  */
 class ExportController extends Controller
 {
-    private const KOLOM_CSV = [
-        'user_id', 'nama', 'email', 'sesi_id', 'waktu_foto', 'status_sesi', 'sesi_uji',
-        'index', 'detik_relatif_t0', 'status_sampel', 'gula_darah',
-        'detak_jantung', 'sistolik', 'diastolik', 'spo2',
-    ];
+    /** Direktori berkas xlsx sementara; dihapus segera setelah terkirim. */
+    private const DIR_SEMENTARA = 'app/private/ekspor';
 
     public function index(Request $request)
     {
-        $lingkup = LingkupResponden::dari($request);
-        $ids = $lingkup->ids();
+        $saringan = SaringanEkspor::dari($request);
 
         return view('admin.ekspor.index', [
             'active' => 'ekspor',
-            'lingkup' => $lingkup,
-            'totalResponden' => $lingkup->jumlahResponden(),
-            'totalSesi' => Sesi::whereIn('user_id', $ids)->count(),
-            'totalSesiUji' => Sesi::whereIn('user_id', $ids)->where('sesi_uji', true)->count(),
-            'totalTitikData' => Sampel::whereHas('sesi', fn ($q) => $q->whereIn('user_id', $ids))
-                ->where('status', 'terisi')
-                ->count(),
+            'saringan' => $saringan,
+            'lingkup' => $saringan->lingkup,
+            'ringkasan' => RingkasanEkspor::hitung($saringan),
+            'penjelasanLembar' => SkemaEkspor::penjelasan(),
+            'format' => FormatEkspor::dari($request->query('format')),
+            'semuaFormat' => FormatEkspor::cases(),
         ]);
+    }
+
+    /**
+     * Satu pintu untuk tombol "Unduh" di halaman: bentuk berkas dipilih lewat
+     * radio, jadi tombolnya cukup satu dan tidak butuh JavaScript untuk
+     * menentukan tujuan. Ketiga rute langsung di bawah tetap ada sebagai
+     * alamat yang jujur dan bisa ditandai.
+     */
+    public function download(Request $request)
+    {
+        return match (FormatEkspor::dari($request->query('format'))) {
+            FormatEkspor::XLSX => $this->downloadXlsx($request),
+            FormatEkspor::CSV => $this->downloadCsv($request),
+            FormatEkspor::JSON => $this->downloadJson($request),
+        };
+    }
+
+    public function downloadXlsx(Request $request): BinaryFileResponse
+    {
+        $saringan = SaringanEkspor::dari($request);
+
+        // xlsx adalah arsip ZIP: tidak bisa dialirkan sepotong-sepotong ke
+        // php://output seperti CSV, jadi dirakit dulu ke berkas sementara.
+        // Memorinya tetap tetap — OpenSpout menulis per baris.
+        File::ensureDirectoryExists(storage_path(self::DIR_SEMENTARA));
+        $sementara = storage_path(self::DIR_SEMENTARA).'/'.uniqid('ekspor_', true).'.xlsx';
+
+        try {
+            (new PenyusunXlsx($saringan))->tulis($sementara, RingkasanEkspor::hitung($saringan));
+        } catch (Throwable $e) {
+            // Berkas yang gagal dirakit tidak pernah terkirim, jadi
+            // deleteFileAfterSend() tidak akan membersihkannya sendiri.
+            File::delete($sementara);
+
+            throw $e;
+        }
+
+        return response()
+            ->download($sementara, FormatEkspor::XLSX->namaBerkas($saringan), [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ])
+            ->deleteFileAfterSend();
     }
 
     public function downloadJson(Request $request): StreamedResponse
     {
-        $lingkup = LingkupResponden::dari($request);
-        // Tanggal berkas mengikuti hari WIB; isi berkas tetap UTC (kembar
-        // dari GET /api/v1/akun/ekspor).
-        $nama = "asawatch_{$lingkup->slug()}_".Waktu::tanggal(now(), 'Y-m-d').'.json';
+        $saringan = SaringanEkspor::dari($request);
 
-        return response()->streamDownload(function () use ($lingkup) {
+        return response()->streamDownload(function () use ($saringan) {
             $out = fopen('php://output', 'w');
 
-            fwrite($out, '{"diekspor_pada":'.json_encode(now()->toIso8601String()));
-            fwrite($out, ',"lingkup":'.json_encode($lingkup->label()));
+            fwrite($out, '{"diekspor_pada":'.json_encode(Waktu::iso(now())));
+            fwrite($out, ',"lingkup":'.json_encode($saringan->lingkup->label()));
+            fwrite($out, ',"saringan":'.json_encode([
+                'periode' => $saringan->labelPeriode(),
+                'dari' => Waktu::iso($saringan->dari),
+                'sampai' => Waktu::iso($saringan->sampai),
+                'sesi_uji_disertakan' => $saringan->sertakanSesiUji,
+            ]));
             fwrite($out, ',"responden":[');
 
             // Ditulis per potong supaya ekspor lintas responden tidak menahan
             // seluruh dataset (sesi + sampel + item makanan) di memori.
             $pertama = true;
-            $this->potongResponden($lingkup, function (User $user) use ($out, &$pertama) {
+
+            (new AliranResponden($saringan))->setiap([
+                'profil', 'sesi.sampel', 'sesi.hasilDeteksi.itemMakanan', 'kalibrasi', 'perangkat',
+            ], function (User $user) use ($out, &$pertama) {
                 fwrite($out, $pertama ? '' : ',');
                 $pertama = false;
 
@@ -76,23 +131,32 @@ class ExportController extends Controller
                     'kalibrasi' => $user->kalibrasi,
                     'perangkat' => $user->perangkat,
                 ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-            }, ['profil', 'sesi.sampel', 'sesi.hasilDeteksi.itemMakanan', 'kalibrasi', 'perangkat']);
+            });
 
             fwrite($out, ']}');
             fclose($out);
-        }, $nama, ['Content-Type' => 'application/json']);
+        }, FormatEkspor::JSON->namaBerkas($saringan), ['Content-Type' => 'application/json']);
     }
 
     public function downloadCsv(Request $request): StreamedResponse
     {
-        $lingkup = LingkupResponden::dari($request);
-        $nama = "asawatch_sampel_{$lingkup->slug()}_".Waktu::tanggal(now(), 'Y-m-d').'.csv';
+        $saringan = SaringanEkspor::dari($request);
 
-        return response()->streamDownload(function () use ($lingkup) {
+        // Excel berlokal Indonesia membaca CSV dengan pemisah titik koma,
+        // sementara read.csv() / pandas menunggu koma. Tidak ada jawaban yang
+        // benar untuk keduanya, jadi pilihannya diserahkan ke peneliti — koma
+        // tetap bawaan supaya berkas lama terbaca sama.
+        $pemisah = $request->query('pemisah') === 'titik_koma' ? ';' : ',';
+
+        return response()->streamDownload(function () use ($saringan, $pemisah) {
             $out = fopen('php://output', 'w');
-            fputcsv($out, self::KOLOM_CSV);
 
-            $this->potongResponden($lingkup, function (User $user) use ($out) {
+            // BOM UTF-8: tanpa ini Excel membaca berkas sebagai ANSI dan nama
+            // berhuruf non-ASCII berubah jadi sampah.
+            fwrite($out, "\u{FEFF}");
+            fputcsv($out, SkemaEkspor::header(SkemaEkspor::LEMBAR_PENGUKURAN), $pemisah);
+
+            (new AliranResponden($saringan))->setiap(['sesi.sampel'], function (User $user) use ($out, $pemisah) {
                 foreach ($user->sesi as $sesi) {
                     foreach ($sesi->sampel as $s) {
                         fputcsv($out, [
@@ -100,45 +164,25 @@ class ExportController extends Controller
                             $user->nama,
                             $user->email,
                             $sesi->id,
-                            $sesi->waktu_foto?->toIso8601String(),
+                            Waktu::tanggal($sesi->waktu_foto, 'Y-m-d H:i'),
                             $sesi->status,
-                            $sesi->sesi_uji ? 1 : 0,
+                            (int) $sesi->sesi_uji,
                             $s->index,
                             $s->detik_relatif_t0,
+                            round($s->detik_relatif_t0 / 60, 2),
                             $s->status,
+                            (int) $s->dari_buffer,
                             $s->gula_darah,
                             $s->detak_jantung,
                             $s->sistolik,
                             $s->diastolik,
                             $s->spo2,
-                        ]);
+                        ], $pemisah);
                     }
                 }
-            }, ['sesi.sampel']);
+            });
 
             fclose($out);
-        }, $nama, ['Content-Type' => 'text/csv']);
-    }
-
-    /**
-     * Jalankan $tulis untuk tiap responden dalam lingkup, 50 akun sekaligus.
-     *
-     * Potongan diambil dari daftar id yang sudah terurut nama, bukan lewat
-     * chunkById — chunkById memaksa paging per id sehingga urutan nama hanya
-     * berlaku di dalam satu potongan, tidak di keseluruhan berkas.
-     */
-    private function potongResponden(LingkupResponden $lingkup, callable $tulis, array $relasi): void
-    {
-        foreach ($lingkup->ids()->chunk(50) as $idPotongan) {
-            $responden = User::responden()
-                ->whereIn('id', $idPotongan)
-                ->with($relasi)
-                ->get()
-                ->sortBy('nama');
-
-            foreach ($responden as $user) {
-                $tulis($user);
-            }
-        }
+        }, FormatEkspor::CSV->namaBerkas($saringan), ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 }

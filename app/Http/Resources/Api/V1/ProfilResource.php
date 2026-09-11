@@ -2,12 +2,13 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Models\Profil;
 use App\Support\Waktu;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property \App\Models\Profil $resource
+ * @property Profil $resource
  */
 class ProfilResource extends JsonResource
 {

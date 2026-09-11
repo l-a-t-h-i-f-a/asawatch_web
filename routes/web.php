@@ -39,6 +39,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('analitik', [AnalyticsController::class, 'index'])->name('analitik');
         Route::get('ekspor', [ExportController::class, 'index'])->name('ekspor.index');
+        Route::get('ekspor/unduh', [ExportController::class, 'download'])->name('ekspor.unduh');
+        Route::get('ekspor/xlsx', [ExportController::class, 'downloadXlsx'])->name('ekspor.xlsx');
         Route::get('ekspor/json', [ExportController::class, 'downloadJson'])->name('ekspor.json');
         Route::get('ekspor/csv', [ExportController::class, 'downloadCsv'])->name('ekspor.csv');
     });

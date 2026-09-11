@@ -6,7 +6,6 @@ use App\Exceptions\ApiException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\KalibrasiRequest;
 use App\Http\Resources\Api\V1\KalibrasiResource;
-use App\Models\Kalibrasi;
 use App\Support\KodeGalat;
 use Illuminate\Http\Request;
 
